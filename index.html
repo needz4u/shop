@@ -1,0 +1,762 @@
+<!--
+COMPLETE PROFESSIONAL REDESIGN – INVO FINTECH PLATFORM
+──────────────────────────────────────────────────────────
+Major changes made:
+• Replaced glassmorphism with solid dark cards (#111627 background, subtle border)
+• New color palette: navy #0a0e1a body, #6c5ce7 accent, #00a878 green
+• Removed all backdrop-filter, glow effects, radial gradients, and liquid-glass animations
+• Typography: Inter for body, JetBrains Mono for numbers; headings reduced to 28px/20px/16px
+• Cards use solid background rgba(17,22,39,0.9), 1px border, border-radius 12px, 24px padding
+• Header: solid #0e1221, no transparency, simple border-bottom
+• Buttons: solid #6c5ce7 primary, outline secondary, border-radius 8px
+• Charts: flat SVG lines, subtle gradient fills, muted colors, simple tooltips
+• Removed all neon glows, pulse animations, aurora effects, particle celebrations simplified
+• Dashboard: clean 2-column grid, single column mobile, balanced spacing
+• Mobile responsive: 768px and 480px breakpoints, stacked layouts, full‑screen modals
+• All JavaScript and HTML content preserved untouched
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invo — Zero Fees • Crypto Made Simple</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0a0e1a;
+            --bg-card: #111627;
+            --bg-header: #0e1221;
+            --bg-input: #0d1120;
+            --border: rgba(255,255,255,0.05);
+            --border-hover: rgba(255,255,255,0.1);
+            --text-primary: #e8e9f0;
+            --text-secondary: #a0a3b5;
+            --text-muted: #6b6f82;
+            --accent: #6c5ce7;
+            --accent-hover: #7b6ff0;
+            --green: #00a878;
+            --green-muted: rgba(0,168,120,0.1);
+            --red: #e74c3c;
+            --red-muted: rgba(231,76,60,0.1);
+            --gold: #f0a500;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+            --transition: 0.2s ease;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --section-padding: 80px 0;
+            --section-padding-mobile: 60px 0;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+
+        /* ── Header ──────────────────── */
+        .main-header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--bg-header); border-bottom: 1px solid var(--border);
+            padding: 14px 24px; margin-bottom: 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 14px;
+        }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; flex-shrink:0; }
+        .logo-icon {
+            width:34px; height:34px; border-radius:8px;
+            background: var(--accent); display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:18px; color:#fff; font-family: var(--font-mono);
+        }
+        .logo-text { font-family:var(--font-mono); font-weight:600; font-size:19px; }
+        .logo-text span { color: #a78bfa; }
+
+        .nav-links { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+        .nav-links a { color:var(--text-secondary); text-decoration:none; font-weight:500; font-size:13px; transition:var(--transition); }
+        .nav-links a:hover { color:var(--text-primary); }
+        .trust-pill {
+            background: var(--green-muted); border:1px solid rgba(0,168,120,0.2);
+            border-radius:20px; padding:5px 14px; font-size:11px; font-weight:600;
+            color:var(--green); display:flex; align-items:center; gap:5px; white-space:nowrap;
+        }
+        .btn {
+            font-weight:500; font-size:13px; padding:10px 20px; border-radius:8px;
+            border:none; cursor:pointer; transition:var(--transition);
+            display:inline-flex; align-items:center; gap:7px;
+            text-decoration:none; font-family:var(--font-sans); min-height:44px;
+        }
+        .btn-outline { background:transparent; border:1px solid rgba(255,255,255,0.12); color:var(--text-primary); }
+        .btn-outline:hover { border-color:var(--accent); background:rgba(108,92,231,0.06); }
+        .btn-primary { background:var(--accent); color:#fff; }
+        .btn-primary:hover { background:var(--accent-hover); }
+        .btn-lg { padding:14px 28px; font-size:14px; }
+        .btn-sm { font-size:11px; padding:7px 14px; min-height:34px; }
+
+        .wallet-badge {
+            display:flex; align-items:center; gap:7px;
+            background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+            padding:6px 14px 6px 6px; cursor:pointer; transition:var(--transition);
+        }
+        .wallet-badge:hover { border-color:var(--border-hover); }
+        .wallet-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+        .wallet-address { font-family:var(--font-mono); font-size:11px; font-weight:500; }
+
+        .hamburger { display:none; background:none; border:1px solid var(--border); color:var(--text-primary); font-size:20px; cursor:pointer; padding:6px 10px; border-radius:var(--radius-sm); line-height:1; transition:var(--transition); }
+        .hamburger:hover { border-color:var(--border-hover); }
+
+        /* ── Sections ────────────────── */
+        .section { padding: var(--section-padding); }
+        .section-title { font-family:var(--font-mono); font-size:20px; font-weight:500; margin-bottom:24px; text-align:center; color:var(--text-primary); }
+        .card {
+            background: rgba(17,22,39,0.9); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 24px; box-shadow: var(--shadow-card); transition: var(--transition);
+        }
+        .card:hover { border-color: var(--border-hover); }
+        .card-accent { border-color: rgba(108,92,231,0.2); }
+
+        /* ── Hero ────────────────────── */
+        .hero { text-align:center; padding:40px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+        .hero h1 { font-family:var(--font-mono); font-size:28px; font-weight:500; line-height:1.3; max-width:600px; color:var(--text-primary); }
+        .hero p { color:var(--text-secondary); font-size:14px; max-width:520px; }
+        .zero-fees-badge {
+            display:inline-flex; align-items:center; gap:7px;
+            background:var(--green-muted); border:1px solid rgba(0,168,120,0.2);
+            border-radius:20px; padding:10px 24px; font-weight:600; color:var(--green); font-size:13px;
+        }
+        .trust-stats {
+            display:flex; gap:28px; flex-wrap:wrap; justify-content:center;
+            background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius-lg);
+            padding:20px 32px; margin-top:20px;
+        }
+        .stat-item { text-align:center; min-width:100px; }
+        .stat-value { font-family:var(--font-mono); font-size:22px; font-weight:600; color:var(--accent); }
+        .stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+
+        /* ── Features ────────────────── */
+        .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+        .feature-card {
+            background: var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+            padding:24px; transition:var(--transition);
+        }
+        .feature-card:hover { border-color:var(--accent); }
+        .feature-icon { font-size:26px; margin-bottom:12px; }
+        .feature-card h3 { font-family:var(--font-mono); margin-bottom:6px; font-size:15px; font-weight:500; }
+        .feature-card p { color:var(--text-secondary); font-size:13px; }
+
+        /* ── Steps ───────────────────── */
+        .steps { display:flex; flex-direction:column; gap:16px; max-width:600px; margin:0 auto; }
+        .step { display:flex; gap:14px; align-items:flex-start; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; transition:var(--transition); }
+        .step:hover { border-color:var(--border-hover); }
+        .step-number { width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:15px; color:#fff; flex-shrink:0; }
+        .step-content h4 { font-family:var(--font-mono); margin-bottom:3px; font-size:14px; font-weight:500; }
+
+        /* ── Wallets Grid ────────────── */
+        .wallets-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+        .wallet-item {
+            background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm);
+            padding:14px 16px; display:flex; align-items:center; gap:8px;
+            font-size:12px; font-weight:500; transition:var(--transition); cursor:default;
+        }
+        .wallet-item:hover { border-color:var(--border-hover); }
+        .wallet-item .check { color:var(--green); font-weight:700; font-size:14px; }
+
+        /* ── Testimonials ────────────── */
+        .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
+        .testimonial {
+            background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+            padding:24px; text-align:center; transition:var(--transition);
+        }
+        .testimonial:hover { border-color:var(--border-hover); }
+        .testimonial-text { font-style:italic; color:var(--text-secondary); margin-bottom:10px; font-size:13px; }
+        .testimonial-author { font-weight:500; color:var(--accent); font-size:12px; }
+
+        /* ── FAQ ─────────────────────── */
+        .faq-item { border-bottom:1px solid var(--border); }
+        .faq-question { padding:16px 0; font-weight:500; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:var(--transition); font-size:14px; }
+        .faq-question:hover { color:var(--accent); }
+        .faq-answer { max-height:0; overflow:hidden; transition:max-height 0.35s ease; color:var(--text-secondary); font-size:13px; line-height:1.7; }
+        .faq-answer.open { max-height:200px; padding-bottom:16px; }
+
+        /* ── Footer ──────────────────── */
+        .footer { border-top:1px solid var(--border); margin-top:50px; padding:36px 0 24px; display:grid; grid-template-columns:1fr 1fr; gap:28px; color:var(--text-muted); font-size:12px; }
+        .footer a { color:var(--text-muted); text-decoration:none; transition:var(--transition); }
+        .footer a:hover { color:var(--text-primary); }
+
+        /* ── Dashboard ───────────────── */
+        .dashboard { display:none; }
+        .landing.hidden { display:none; }
+        .dashboard.active { display:block; }
+        .balance-amount { font-family:var(--font-mono); font-size:42px; font-weight:500; color:var(--text-primary); }
+        .token-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); gap:10px; }
+        .token-row:last-child { border-bottom:none; }
+        .tx-item { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); gap:10px; cursor:pointer; transition:background 0.15s; }
+        .tx-item:hover { background:rgba(255,255,255,0.01); }
+        .tx-item:last-child { border-bottom:none; }
+
+        /* ── Modals ──────────────────── */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.15s ease; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .modal { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-xl); padding:28px; width:90%; max-width:460px; box-shadow:0 16px 48px rgba(0,0,0,0.6); animation:slideUp 0.2s ease; max-height:90vh; overflow-y:auto; }
+        @keyframes slideUp { from{transform:translateY(16px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+        .modal h3 { font-family:var(--font-mono); margin-bottom:18px; font-size:18px; font-weight:500; }
+        .input-group { margin-bottom:16px; }
+        .input-group label { display:block; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:6px; }
+        .input-group input,.input-group select,.input-group textarea { width:100%; padding:12px 16px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-family:var(--font-mono); font-size:13px; outline:none; transition:var(--transition); }
+        .input-group textarea { resize:vertical; min-height:85px; }
+        .input-group input:focus,.input-group select:focus,.input-group textarea:focus { border-color:var(--accent); }
+        .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+
+        /* ── Toast ───────────────────── */
+        .toast { position:fixed; bottom:20px; right:20px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:14px 22px; z-index:300; font-weight:500; font-size:12px; box-shadow:0 8px 24px rgba(0,0,0,0.5); animation:slideInRight 0.25s ease; display:flex; align-items:center; gap:8px; }
+        @keyframes slideInRight { from{transform:translateX(110%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+        .toast.success { border-color:var(--green); color:var(--green); }
+        .toast.error { border-color:var(--red); color:var(--red); }
+
+        .scroll-top { position:fixed; bottom:20px; left:20px; width:36px; height:36px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; opacity:0; pointer-events:none; transition:0.3s; z-index:50; }
+        .scroll-top.visible { opacity:1; pointer-events:auto; }
+
+        /* ── Charts & Visuals ────────── */
+        .dashboard-clock { font-family:var(--font-mono); font-size:12px; color:var(--text-muted); text-align:right; margin-bottom:14px; }
+        .price-ticker { overflow:hidden; margin:14px 0; border-radius:var(--radius-sm); background:var(--bg-card); border:1px solid var(--border); padding:6px 0; white-space:nowrap; }
+        .ticker-track { display:inline-flex; animation:ticker-scroll 22s linear infinite; gap:32px; }
+        .ticker-track:hover { animation-play-state:paused; }
+        @keyframes ticker-scroll { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+        .ticker-item { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; }
+        .ticker-item .up { color:var(--green); }
+        .ticker-item .down { color:var(--red); }
+
+        .donut-chart { display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap; position:relative; }
+        .chart-svg { width:120px; height:120px; transform:rotate(-90deg); }
+        .chart-segment { transition: stroke-dashoffset 0.8s ease; cursor:pointer; }
+        .chart-segment:hover { filter: brightness(1.2); }
+        .chart-legend { display:flex; flex-direction:column; gap:6px; font-size:11px; }
+        .legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+        .donut-centre-text { font-family:var(--font-mono); font-size:14px; fill:var(--text-primary); text-anchor:middle; dominant-baseline:middle; }
+        .donut-centre-sub { font-family:var(--font-mono); font-size:8px; fill:var(--text-muted); text-anchor:middle; dominant-baseline:middle; }
+
+        .chart-tooltip {
+            position: absolute; pointer-events: none; z-index: 10;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 7px 10px; font-size: 10px; font-family: var(--font-mono);
+            color: var(--text-primary); box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+            opacity: 0; transition: opacity 0.15s; white-space: nowrap; max-width:180px;
+        }
+        .chart-tooltip.visible { opacity: 1; }
+        .chart-tooltip .tt-label { color: var(--text-muted); font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .chart-tooltip .tt-value { font-weight: 600; font-size: 12px; color: var(--accent); }
+
+        .area-chart-container { position: relative; width: 100%; height: 200px; cursor: crosshair; }
+        .area-chart-svg { width: 100%; height: 100%; }
+        .area-grid-line { stroke: rgba(255,255,255,0.03); stroke-width: 1; stroke-dasharray: 3 3; }
+        .area-fill { opacity: 0.2; }
+        .area-line { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .area-hover-line { stroke: rgba(255,255,255,0.2); stroke-width: 1; stroke-dasharray: 2 2; pointer-events: none; }
+        .area-hover-dot { fill: var(--accent); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
+
+        .price-chart-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .price-chart-controls select { padding: 7px 12px; background:var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: var(--font-mono); font-size: 12px; outline: none; cursor: pointer; }
+        .time-toggle { display: flex; gap: 3px; }
+        .time-toggle-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: var(--font-mono); font-size: 10px; transition: var(--transition); }
+        .time-toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .time-toggle-btn:hover:not(.active) { border-color: var(--accent); color: var(--text-primary); }
+
+        .mini-sparkline { width: 50px; height: 24px; flex-shrink: 0; transition: filter 0.2s; }
+        .mini-sparkline:hover { filter: brightness(1.4); }
+
+        .token-bars { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
+        .token-bar-row { display:flex; align-items:center; gap:7px; font-size:10px; position:relative; }
+        .token-bar-label { width:36px; font-family:var(--font-mono); text-align:right; color:var(--text-muted); }
+        .token-bar-track { flex:1; height:14px; background:rgba(255,255,255,0.03); border-radius:7px; overflow:hidden; cursor:pointer; }
+        .token-bar-fill { height:100%; border-radius:7px; transition:width 1s ease, filter 0.2s; cursor:pointer; }
+        .token-bar-fill:hover { filter: brightness(1.3); }
+
+        .gauge-container { display:flex; align-items:center; justify-content:center; margin-top:6px; }
+        .gauge-svg { width:80px; height:48px; }
+        .gauge-bg { fill:none; stroke:rgba(255,255,255,0.04); stroke-width:6; }
+        .gauge-fill { fill:none; stroke:var(--green); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 1.2s ease; }
+        .gauge-value { font-family:var(--font-mono); font-size:10px; fill:var(--green); text-anchor:middle; }
+
+        .fee-estimator { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--text-muted); margin-top:3px; font-family:var(--font-mono); }
+        .fee-estimator .fee-amount { color:var(--gold); font-weight:600; }
+
+        .security-badges { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:14px; }
+        .security-badge { display:inline-flex; align-items:center; gap:5px; font-size:10px; color:var(--text-muted); }
+
+        .gradient-sep { border:none; height:1px; background:var(--border); margin:32px 0; }
+
+        .fee-comparison { display:flex; flex-direction:column; gap:12px; max-width:520px; margin:0 auto; }
+        .fee-comp-row { display:flex; align-items:center; gap:10px; }
+        .fee-comp-label { width:100px; font-weight:500; font-size:12px; text-align:right; }
+        .fee-comp-bar-track { flex:1; height:22px; background:rgba(255,255,255,0.02); border-radius:6px; overflow:hidden; cursor:pointer; }
+        .fee-comp-bar { height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:7px; font-family:var(--font-mono); font-size:10px; font-weight:600; color:#fff; transition:width 1.2s ease; }
+        .fee-comp-bar.invo { background:var(--green); width:0%; }
+        .fee-comp-bar.comp-a { background:var(--gold); width:0%; }
+        .fee-comp-bar.comp-b { background:var(--red); width:0%; }
+
+        .status-row { display:flex; align-items:center; gap:7px; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px; }
+        .status-row:last-child { border-bottom:none; }
+        .status-dot-green { width:7px; height:7px; border-radius:50%; background:var(--green); }
+
+        .dashboard-divider { border:none; height:1px; background:var(--border); margin:20px 0; }
+
+        .roadmap-timeline { position:relative; padding:16px 0; }
+        .timeline-line { position:absolute; left:50%; top:0; bottom:0; width:1px; background:var(--border); transform:translateX(-50%); }
+        .milestone { display:flex; align-items:center; margin-bottom:32px; position:relative; }
+        .milestone.left { justify-content:flex-start; }
+        .milestone.right { justify-content:flex-end; }
+        .milestone-content { width:44%; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; position:relative; }
+        .milestone-dot { position:absolute; top:50%; left:50%; width:12px; height:12px; border-radius:50%; background:var(--accent); transform:translate(-50%,-50%); z-index:2; }
+        .milestone.green .milestone-dot { background:var(--green); }
+
+        .donate-grid { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+        .donate-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 24px; cursor:pointer; transition:var(--transition); text-align:center; }
+        .donate-card:hover { border-color:var(--green); }
+        .donate-custom { display:flex; gap:8px; align-items:center; margin-top:16px; justify-content:center; }
+
+        .partners-carousel { overflow:hidden; padding:14px 0; }
+        .partners-track { display:flex; gap:32px; animation:scroll-partners 28s linear infinite; width:max-content; }
+        @keyframes scroll-partners { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+        .partner-logo { width:100px; height:50px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:14px; color:var(--text-muted); flex-shrink:0; }
+
+        .settings-gear { cursor:pointer; font-size:16px; opacity:0.6; transition:0.2s; margin-left:6px; }
+        .settings-gear:hover { opacity:1; }
+        .network-pill { background:var(--green-muted); border:1px solid rgba(0,168,120,0.2); border-radius:14px; padding:3px 9px; font-size:9px; display:flex; align-items:center; gap:4px; color:var(--green); font-family:var(--font-mono); white-space:nowrap; }
+        .network-dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
+
+        .ripple-container { position:relative; overflow:hidden; }
+        .ripple-effect { position:absolute; border-radius:50%; background:rgba(255,255,255,0.15); transform:scale(0); animation:ripple 0.5s linear; pointer-events:none; }
+        @keyframes ripple { to{transform:scale(4); opacity:0;} }
+
+        .skeleton-overlay { position:fixed; inset:0; background:rgba(10,14,26,0.95); z-index:150; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
+        .skeleton-card { width:240px; height:160px; background:var(--bg-card); border-radius:var(--radius); animation:pulse-skeleton 1.5s infinite; border:1px solid var(--border); }
+        @keyframes pulse-skeleton { 0%,100%{opacity:0.5;} 50%{opacity:0.8;} }
+
+        .shortcuts-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:250; display:flex; align-items:center; justify-content:center; }
+        .shortcuts-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; min-width:240px; }
+
+        .social-btn { width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); font-size:14px; cursor:pointer; transition:var(--transition); text-decoration:none; }
+        .social-btn:hover { border-color:var(--accent); color:var(--text-primary); }
+
+        /* ══════════════════════════════ RESPONSIVE ══════════════════════════════ */
+        @media (max-width:768px) {
+            .section { padding: var(--section-padding-mobile); }
+            .hero h1 { font-size:22px; }
+            .hero p { font-size:13px; }
+            .balance-amount { font-size:32px; }
+            .section-title { font-size:18px; }
+            .main-header { flex-direction:column; align-items:stretch; gap:10px; }
+            .nav-links { display:none; flex-direction:column; gap:6px; width:100%; padding-top:6px; border-top:1px solid var(--border); }
+            .nav-links.open { display:flex; }
+            .hamburger { display:block; align-self:flex-end; }
+            .features-grid { grid-template-columns:1fr; }
+            .testimonials-grid { grid-template-columns:1fr; }
+            .milestone { flex-direction:column; align-items:flex-start; }
+            .milestone.left, .milestone.right { justify-content:flex-start; }
+            .milestone-content { width:88%; margin-left:24px; }
+            .timeline-line { left:6px; }
+            .milestone-dot { left:6px; top:16px; }
+            .trust-stats { gap:14px; padding:16px; }
+            .stat-item { min-width:80px; }
+            .stat-value { font-size:18px; }
+            .footer { grid-template-columns:1fr; gap:20px; }
+            .modal { max-width:100%; border-radius:var(--radius-xl) var(--radius-xl) 0 0; margin-top:auto; max-height:88vh; padding:20px 16px; }
+            .modal-overlay { align-items:flex-end; }
+            .fee-comp-label { width:60px; font-size:10px; }
+            .dashboard-clock { text-align:center; }
+            .ticker-item { font-size:10px; }
+            .gauge-svg { width:64px; height:38px; }
+            .area-chart-container { height:160px; }
+            .mini-sparkline { width:40px; height:20px; }
+            .container { padding:0 16px; }
+        }
+
+        @media (max-width:480px) {
+            .hero h1 { font-size:20px; }
+            .balance-amount { font-size:28px; }
+            .section-title { font-size:17px; }
+            .card { padding:18px; }
+            .btn { padding:10px 16px; font-size:12px; min-height:40px; }
+            .btn-lg { padding:12px 20px; font-size:13px; }
+            .trust-stats { flex-direction:column; align-items:center; gap:10px; }
+            .wallet-badge { font-size:9px; padding:4px 10px 4px 4px; }
+            .network-pill { font-size:8px; padding:2px 7px; }
+            .wallets-grid { grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:8px; }
+            .wallet-item { padding:10px 12px; font-size:10px; }
+            .milestone-content { width:95%; margin-left:18px; }
+            .fee-comp-label { width:44px; font-size:9px; }
+            .donate-card { padding:14px 18px; }
+            .social-btn { width:28px; height:28px; font-size:12px; }
+            .area-chart-container { height:130px; }
+            .mini-sparkline { width:34px; height:16px; }
+            .time-toggle-btn { padding:4px 8px; font-size:9px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ── Header ────────────────── -->
+        <header class="main-header">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <a href="#" class="logo"><div class="logo-icon">⦿</div><div class="logo-text">Invo<span>.</span></div></a>
+                    <span style="font-size:9px; color:var(--text-muted); background:rgba(108,92,231,0.08); border:1px solid rgba(108,92,231,0.15); border-radius:12px; padding:3px 10px; font-family:var(--font-mono);">⚡ Powered by Ethereum</span>
+                </div>
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+            </div>
+            <nav class="nav-links" id="navLinks">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#wallets">Wallets</a>
+                <a href="#roadmap">Roadmap</a>
+                <a href="#testimonials">Trust</a>
+                <a href="#faq">FAQ</a>
+                <span class="trust-pill">🛡️ Non‑Profit • Zero Fees</span>
+            </nav>
+            <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                <div class="network-pill" id="networkPill"><div class="network-dot"></div><span>Ethereum Mainnet</span><span id="blockNumber" style="margin-left:2px;">#19,847,256</span><span id="gasPrice" style="margin-left:3px; color:var(--gold);">⚡24 gwei</span></div>
+                <div class="wallet-badge" id="walletBadge" onclick="handleWalletClick()"><div class="wallet-dot" id="walletDot"></div><span class="wallet-address" id="walletAddressDisplay">Not Connected</span></div>
+                <span class="settings-gear" id="settingsGear" onclick="openSettingsModal()" title="Settings">⚙️</span>
+            </div>
+        </header>
+
+        <!-- ── Landing ───────────────── -->
+        <div id="landingPage">
+            <section class="hero" style="padding-top:24px;">
+                <div style="font-size:48px;">🔐</div>
+                <h1>Connect Unstoppable Wallet</h1>
+                <p>Your keys, your crypto — now with <strong>zero transfer fees</strong> forever. Invo is a <strong>non‑profit organization</strong> built by the community, for the community.</p>
+                <div class="zero-fees-badge">🎉 0% TRANSFER FEES &nbsp;|&nbsp; 🌍 NON‑PROFIT &nbsp;|&nbsp; 🔒 SECURE</div>
+                <button class="btn btn-primary btn-lg" onclick="openConnectModal()">🔗 Connect Wallet</button>
+                <p style="font-size:12px; color:var(--text-muted);">Enter your 12‑word recovery phrase — we support 20+ wallets</p>
+            </section>
+            <div class="trust-stats" id="trustStats">
+                <div class="stat-item"><div class="stat-value">$2.4B+</div><div class="stat-label">Volume Processed</div></div>
+                <div class="stat-item"><div class="stat-value">780K+</div><div class="stat-label">Community Members</div></div>
+                <div class="stat-item"><div class="stat-value">0%</div><div class="stat-label">Fees Forever</div></div>
+                <div class="stat-item"><div class="stat-value">24/7</div><div class="stat-label">Support</div></div>
+                <div class="stat-item" id="donationsStat"><div class="stat-value" id="donationsValue">$847K</div><div class="stat-label">Community Donations</div></div>
+            </div>
+            <hr class="gradient-sep">
+            <section id="features" class="section"><h2 class="section-title">Why Invo?</h2><div class="features-grid">
+                <div class="feature-card"><div class="feature-icon">💸</div><h3>Zero Transfer Fees</h3><p>We are a non‑profit funded by donations and grants. No hidden costs, no surprise deductions — just pure crypto.</p></div>
+                <div class="feature-card"><div class="feature-icon">🔐</div><h3>Non‑Custodial</h3><p>You hold your keys. We never store your seed phrase or private keys. Your wallet, your control.</p></div>
+                <div class="feature-card"><div class="feature-icon">🌐</div><h3>Multi‑Wallet Support</h3><p>Works with MetaMask, Trust Wallet, Ledger, Coinbase Wallet, and 20+ other popular wallets.</p></div>
+                <div class="feature-card"><div class="feature-icon">⚡</div><h3>Lightning Fast</h3><p>Built on efficient infrastructure. Transactions propagate in seconds, with minimal gas optimization.</p></div>
+                <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Community Audited</h3><p>Our code is open‑source and regularly reviewed by independent security researchers.</p></div>
+                <div class="feature-card"><div class="feature-icon">🤝</div><h3>Donation Driven</h3><p>As a non‑profit, we rely on voluntary contributions. Every donation helps keep the platform free.</p></div>
+            </div></section>
+            <div class="card" style="max-width:580px; margin:0 auto 32px;"><h3 style="font-family:var(--font-mono); text-align:center; margin-bottom:14px; font-size:15px; font-weight:500;">📊 Average Transfer Fee Comparison</h3><div class="fee-comparison" id="feeComparison">
+                <div class="fee-comp-row"><div class="fee-comp-label" style="color:var(--green);">Invo</div><div class="fee-comp-bar-track"><div class="fee-comp-bar invo" data-target="0">0%</div></div></div>
+                <div class="fee-comp-row"><div class="fee-comp-label" style="color:var(--gold);">Competitor A</div><div class="fee-comp-bar-track"><div class="fee-comp-bar comp-a" data-target="1.2">1.2%</div></div></div>
+                <div class="fee-comp-row"><div class="fee-comp-label" style="color:var(--red);">Competitor B</div><div class="fee-comp-bar-track"><div class="fee-comp-bar comp-b" data-target="0.8">0.8%</div></div></div>
+            </div></div>
+            <hr class="gradient-sep">
+            <section id="how-it-works" class="section"><h2 class="section-title">How It Works</h2><div class="steps">
+                <div class="step"><div class="step-number">1</div><div class="step-content"><h4>Connect Your Wallet</h4><p style="color:var(--text-secondary);">Enter your 12‑word recovery phrase — Invo never stores it. Supports 20+ wallets.</p></div></div>
+                <div class="step"><div class="step-number">2</div><div class="step-content"><h4>Send or Swap Instantly</h4><p style="color:var(--text-secondary);">Choose any supported token and send to any address — with zero extra fees.</p></div></div>
+                <div class="step"><div class="step-number">3</div><div class="step-content"><h4>Track Everything</h4><p style="color:var(--text-secondary);">View your balance, transaction history, and gas savings in a clean dashboard.</p></div></div>
+            </div></section>
+            <hr class="gradient-sep">
+            <section id="wallets" class="section"><h2 class="section-title">20+ Supported Wallets</h2><div class="wallets-grid">
+                <div class="wallet-item"><span class="check">✓</span><span>MetaMask</span></div><div class="wallet-item"><span class="check">✓</span><span>Coinbase Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Trust Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Ledger Live</span></div><div class="wallet-item"><span class="check">✓</span><span>Trezor Suite</span></div><div class="wallet-item"><span class="check">✓</span><span>Exodus</span></div><div class="wallet-item"><span class="check">✓</span><span>Atomic Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>MyEtherWallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Rainbow</span></div><div class="wallet-item"><span class="check">✓</span><span>Argent</span></div><div class="wallet-item"><span class="check">✓</span><span>Pillar</span></div><div class="wallet-item"><span class="check">✓</span><span>imToken</span></div><div class="wallet-item"><span class="check">✓</span><span>TokenPocket</span></div><div class="wallet-item"><span class="check">✓</span><span>BitKeep</span></div><div class="wallet-item"><span class="check">✓</span><span>Safepal</span></div><div class="wallet-item"><span class="check">✓</span><span>MathWallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Guarda</span></div><div class="wallet-item"><span class="check">✓</span><span>Edge</span></div><div class="wallet-item"><span class="check">✓</span><span>Unstoppable Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Frame</span></div>
+            </div><p style="text-align:center; margin-top:12px; color:var(--text-muted); font-size:12px;">All wallets that use a standard 12‑word recovery phrase are fully supported</p></section>
+            <hr class="gradient-sep">
+            <section id="roadmap" class="section"><h2 class="section-title">Roadmap</h2><div class="roadmap-timeline"><div class="timeline-line"></div>
+                <div class="milestone left green"><div class="milestone-content"><h4 style="font-family:var(--font-mono);font-weight:500;">Q1 2025</h4><p>Launch — Zero‑fee transfers live on Ethereum</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone right"><div class="milestone-content"><h4 style="font-family:var(--font-mono);font-weight:500;">Q2 2025</h4><p>Multi‑chain support (Solana, Avalanche)</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone left"><div class="milestone-content"><h4 style="font-family:var(--font-mono);font-weight:500;">Q3 2025</h4><p>Mobile app beta for iOS & Android</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone right"><div class="milestone-content"><h4 style="font-family:var(--font-mono);font-weight:500;">Q4 2025</h4><p>DAO governance launch — community voting</p></div><div class="milestone-dot"></div></div>
+            </div></section>
+            <hr class="gradient-sep">
+            <section id="donate" class="section"><h2 class="section-title">Support Our Mission</h2><div class="donate-grid">
+                <div class="donate-card" onclick="donate(5)"><div style="font-size:22px;font-weight:600;">$5</div><div style="color:var(--text-muted);">Buy us a coffee</div></div>
+                <div class="donate-card" onclick="donate(25)"><div style="font-size:22px;font-weight:600;">$25</div><div style="color:var(--text-muted);">Help development</div></div>
+                <div class="donate-card" onclick="donate(100)"><div style="font-size:22px;font-weight:600;">$100</div><div style="color:var(--text-muted);">Become a patron</div></div>
+            </div><div class="donate-custom"><input type="number" id="customDonation" placeholder="Custom amount" min="1" style="width:100px;padding:9px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-mono);font-size:13px;"><button class="btn btn-outline btn-sm" onclick="donateCustom()">Donate</button></div></section>
+            <section id="partners" class="section"><h2 class="section-title">Our Partners</h2><div class="partners-carousel"><div class="partners-track" id="partnersTrack"><div class="partner-logo">CHAIN</div><div class="partner-logo">BLOCK</div><div class="partner-logo">DEFI</div><div class="partner-logo">WEB3</div><div class="partner-logo">META</div><div class="partner-logo">VAULT</div><div class="partner-logo">CHAIN</div><div class="partner-logo">BLOCK</div><div class="partner-logo">DEFI</div><div class="partner-logo">WEB3</div><div class="partner-logo">META</div><div class="partner-logo">VAULT</div></div></div></section>
+            <hr class="gradient-sep">
+            <section id="testimonials" class="section"><h2 class="section-title">What Our Users Say</h2><div class="testimonials-grid">
+                <div class="testimonial"><p class="testimonial-text">"Invo made crypto transfers feel like sending an email. Zero fees and super fast. Love that they're a non‑profit."</p><div class="testimonial-author">— Alex R., DeFi Developer</div></div>
+                <div class="testimonial"><p class="testimonial-text">"Connected my Trust Wallet in seconds. Clean interface, and the zero‑fee promise is real."</p><div class="testimonial-author">— Maria G., NFT Artist</div></div>
+                <div class="testimonial"><p class="testimonial-text">"Finally, a platform that doesn't nickel and dime you. Invo restored my faith in crypto."</p><div class="testimonial-author">— Jason K., Investor</div></div>
+                <div class="testimonial"><p class="testimonial-text">"Transparent, community‑driven, and actually free. Highly recommended for everyday use."</p><div class="testimonial-author">— Sarah L., Community Organizer</div></div>
+            </div></section>
+            <section id="faq" class="section"><h2 class="section-title">Frequently Asked Questions</h2><div class="card">
+                <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">How does Invo stay free? <span>▼</span></div><div class="faq-answer">We are a registered non‑profit funded entirely by community donations and grants. No investors, no profit motive — just a mission to make crypto accessible for everyone, everywhere.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Which wallets are supported? <span>▼</span></div><div class="faq-answer">We support any wallet that uses a standard 12‑word recovery phrase, including MetaMask, Coinbase Wallet, Trust Wallet, Ledger, Trezor, Exodus, and 20+ more popular wallets.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Are there any hidden fees? <span>▼</span></div><div class="faq-answer">Never. The only cost is the blockchain network gas fee, which goes to miners/validators — not to Invo. We charge absolutely nothing on transfers or swaps.</div></div>
+                <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Can I donate to support Invo? <span>▼</span></div><div class="faq-answer">Yes! As a non‑profit, we welcome donations. Every contribution helps maintain the platform and keep it free for the entire community.</div></div>
+            </div></section>
+            <div style="text-align:center; margin:40px 0;"><button class="btn btn-primary btn-lg" onclick="openConnectModal()">🔗 Connect Your Wallet Now</button></div>
+        </div>
+
+        <!-- ── Dashboard ──────────────── -->
+        <div id="dashboardPage" class="dashboard">
+            <div style="background:rgba(240,165,0,0.06); border:1px solid rgba(240,165,0,0.15); border-radius:var(--radius); padding:12px 20px; display:flex; align-items:center; gap:8px; font-weight:500; color:var(--gold); margin-bottom:20px; font-size:13px;">⭐ Invo never charges fees for transfers or swaps. Only standard network gas fees apply. We are a non‑profit.</div>
+            <div class="dashboard-clock" id="dashboardClock"></div>
+            <div class="price-ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+            <div class="card card-accent" style="text-align:center;" id="balanceCard">
+                <div style="text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:8px; font-size:11px;">💰 Total Balance</div>
+                <div class="balance-amount" id="totalBalance">$0.00</div>
+                <div id="balanceChange" style="display:inline-flex; align-items:center; gap:4px; font-size:13px; border-radius:14px; padding:5px 12px; margin-top:10px;">▲ 0.00%</div>
+                <div style="margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn btn-primary ripple-container" onclick="openSendModal()">📤 Send</button>
+                    <button class="btn btn-outline ripple-container" onclick="openReceiveModal()">📥 Receive</button>
+                    <button class="btn btn-outline ripple-container" onclick="openSwapModal()">🔄 Swap</button>
+                </div>
+                <hr class="dashboard-divider">
+                <h4 style="font-family:var(--font-mono); font-size:14px; font-weight:500; margin-bottom:10px; text-align:left;">📈 Balance Trend</h4>
+                <div class="area-chart-container" id="areaChartContainer" style="height:180px;">
+                    <svg class="area-chart-svg" id="areaChartSvg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet"></svg>
+                    <div class="chart-tooltip" id="areaTooltip"></div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;" class="dashboard-grid-2col">
+                <div class="card" id="portfolioChartCard">
+                    <h3 style="font-family:var(--font-mono); margin-bottom:14px; font-size:15px; font-weight:500;">📊 Portfolio Distribution</h3>
+                    <div class="donut-chart" id="donutChart"></div>
+                </div>
+                <div class="card">
+                    <h3 style="font-family:var(--font-mono); margin-bottom:14px; font-size:15px; font-weight:500;">📊 Quick Stats</h3>
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--accent);" id="statTx">0</div><div style="font-size:9px; color:var(--text-muted);">Transactions</div></div>
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--green);" id="statGas">$0</div><div style="font-size:9px; color:var(--text-muted);">Gas Saved</div></div>
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--gold);" id="statStreak">0d</div><div style="font-size:9px; color:var(--text-muted);">Streak</div></div>
+                    </div>
+                    <div class="gauge-container" id="gasGaugeContainer"></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; font-size:12px;">
+                        <div><span style="color:var(--text-muted);">Portfolio Value:</span> <span id="statPortfolioValue" style="font-weight:500;">$0</span></div>
+                        <div><span style="color:var(--text-muted);">Best Asset:</span> <span id="statBestAsset" style="font-weight:500; color:var(--accent);">—</span></div>
+                        <div><span style="color:var(--text-muted);">Last Activity:</span> <span id="statLastActivity" style="font-weight:500;">—</span></div>
+                    </div>
+                    <div style="background:var(--bg-input); border-radius:var(--radius-sm); padding:12px; text-align:center; margin-top:12px;">
+                        <span style="color:var(--text-muted); font-size:11px;">🔗 Connected via </span><span style="color:var(--accent); font-weight:500; font-size:11px;">Unstoppable Wallet</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:20px;" id="priceChartCard">
+                <div class="price-chart-controls">
+                    <h3 style="font-family:var(--font-mono); font-size:15px; font-weight:500; margin:0;">📉 Price Chart</h3>
+                    <select id="priceTokenSelect" onchange="renderPriceChart()"><option value="ETH">ETH</option><option value="USDC">USDC</option><option value="MATIC">MATIC</option><option value="UNI">UNI</option><option value="LINK">LINK</option><option value="AAVE">AAVE</option></select>
+                    <div class="time-toggle" id="timeToggle"><button class="time-toggle-btn" data-range="7" onclick="setPriceRange('7D',this)">7D</button><button class="time-toggle-btn active" data-range="30" onclick="setPriceRange('30D',this)">30D</button><button class="time-toggle-btn" data-range="90" onclick="setPriceRange('90D',this)">90D</button></div>
+                </div>
+                <div class="area-chart-container" id="priceChartContainer" style="height:180px;"><svg class="area-chart-svg" id="priceChartSvg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"></svg><div class="chart-tooltip" id="priceTooltip"></div></div>
+            </div>
+
+            <div class="card" style="margin-top:20px;">
+                <h3 style="font-family:var(--font-mono); margin-bottom:14px; font-size:15px; font-weight:500;">🪙 Your Tokens</h3>
+                <div id="tokenList"></div>
+                <hr class="dashboard-divider">
+                <div class="token-bars" id="tokenBars"></div>
+            </div>
+
+            <div class="card" style="margin-top:20px;">
+                <h3 style="font-family:var(--font-mono); margin-bottom:14px; font-size:15px; font-weight:500;">📋 Recent Activity</h3>
+                <div id="txList"></div>
+            </div>
+        </div>
+
+        <!-- ── Footer ────────────────── -->
+        <footer class="footer">
+            <div><div style="font-weight:600;margin-bottom:5px;font-size:14px;">Invo.</div><p>© 2025 Invo — A Non‑Profit Crypto Platform</p><p style="margin-top:2px;font-size:11px;color:var(--text-muted);">Built on Ethereum. Zero fees. Forever.</p><div style="margin-top:12px;display:flex;gap:7px;"><a href="#" class="social-btn" title="Twitter/X">𝕏</a><a href="#" class="social-btn" title="Discord">🎮</a><a href="#" class="social-btn" title="GitHub">🐙</a><a href="#" class="social-btn" title="Telegram">✈️</a></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><div style="font-weight:600;margin-bottom:5px;">Product</div><a href="#features">Features</a><br><a href="#wallets">Wallets</a><br><a href="#faq">FAQ</a></div><div><div style="font-weight:600;margin-bottom:5px;">Organization</div><a href="#">About</a><br><a href="#donate">Donate</a><br><a href="#">GitHub</a></div><div><div style="font-weight:600;margin-bottom:5px;">Legal</div><a href="#">Terms</a><br><a href="#">Privacy</a><br><a href="#">Contact</a></div><div><div style="font-weight:600;margin-bottom:5px;">Stay Updated</div><input type="email" id="subscribeEmail" placeholder="your@email.com" style="padding:6px 9px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);width:130px;font-size:10px;"><button class="btn btn-sm btn-outline" style="margin-top:5px;" onclick="subscribe()">Subscribe</button></div></div>
+            <div style="grid-column:1/-1;text-align:center;margin-top:12px;"><div class="security-badges"><span class="security-badge">🔒 Audited by CertiK</span><span class="security-badge">🛡️ Bug Bounty</span><span class="security-badge">✅ KYC‑free</span><span class="security-badge">📜 MiCA Ready</span></div><a href="#" style="display:inline-flex;align-items:center;gap:4px;background:rgba(108,92,231,0.06);border:1px solid rgba(108,92,231,0.15);border-radius:6px;padding:6px 12px;color:var(--accent);font-weight:500;text-decoration:none;margin-top:10px;font-size:12px;" onclick="openStatusModal();return false;">📡 All Systems Operational ✅</a><br><a href="#" style="display:inline-flex;align-items:center;gap:4px;background:rgba(108,92,231,0.06);border:1px solid rgba(108,92,231,0.15);border-radius:6px;padding:6px 12px;color:var(--accent);font-weight:500;text-decoration:none;margin-top:6px;font-size:12px;">⭐ Star us on GitHub</a></div>
+        </footer>
+    </div>
+
+    <!-- ── Modals ──────────────────── -->
+    <div class="modal-overlay" id="connectModal" style="display:none;"><div class="modal"><h3>🔑 Connect with Seed Phrase</h3><div class="input-group"><label>12‑word recovery phrase</label><textarea id="seedInput" placeholder="Enter your 12 words separated by spaces..."></textarea></div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('connectModal')">Cancel</button><button class="btn btn-primary" onclick="connectWithSeed()">Connect Wallet</button></div></div></div>
+    <div class="modal-overlay" id="sendModal" style="display:none;"><div class="modal"><h3>📤 Send Crypto</h3><div class="input-group"><label>Token</label><select id="sendToken"><option>ETH</option><option>USDC</option><option>MATIC</option><option>UNI</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>Recipient</label><input type="text" id="sendAddress" placeholder="0x... or domain.crypto"></div><div class="input-group"><label>Amount</label><input type="number" id="sendAmount" placeholder="0.00" step="0.01" oninput="updateFeeEstimate()"></div><p style="color:var(--green);font-size:11px;margin-bottom:3px;">✨ Invo charges 0% transfer fees.</p><div class="fee-estimator" id="feeEstimator">⛽ Estimated gas: <span class="fee-amount" id="feeAmount">~$2.34</span> (Ethereum)</div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('sendModal')">Cancel</button><button class="btn btn-primary" onclick="confirmSend()">Send</button></div></div></div>
+    <div class="modal-overlay" id="receiveModal" style="display:none;"><div class="modal" style="text-align:center;"><h3>📥 Receive Crypto</h3><p style="color:var(--text-secondary);font-size:12px;">Share your address</p><div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);margin:14px 0;font-family:var(--font-mono);word-break:break-all;color:var(--accent);" id="receiveAddress">0xNotConnected</div><div class="modal-actions" style="justify-content:center;"><button class="btn btn-outline btn-sm" onclick="copyAddress()">📋 Copy</button><button class="btn btn-outline btn-sm" onclick="closeModal('receiveModal')">Close</button></div><div style="margin-top:12px;text-align:left;"><h4 style="font-family:var(--font-mono);font-size:12px;font-weight:500;">Address Book</h4><div id="addressBookList" style="display:flex;flex-direction:column;gap:5px;"></div><button class="btn btn-outline btn-sm" style="margin-top:5px;" onclick="saveAddress()">💾 Save Current Address</button></div></div></div>
+    <div class="modal-overlay" id="swapModal" style="display:none;"><div class="modal"><h3>🔄 Quick Swap</h3><div class="input-group"><label>From</label><select id="swapFrom"><option>ETH</option><option>USDC</option><option>MATIC</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>To</label><select id="swapTo"><option>USDC</option><option>ETH</option><option>MATIC</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>Amount</label><input type="number" id="swapAmount" placeholder="0.00" step="0.01"></div><p style="color:var(--green);font-size:11px;margin-bottom:3px;">✨ 0% swap fee from Invo.</p><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('swapModal')">Cancel</button><button class="btn btn-primary" onclick="confirmSwap()">Swap</button></div></div></div>
+    <div class="modal-overlay" id="settingsModal" style="display:none;"><div class="modal"><h3>⚙️ Settings</h3><div class="input-group"><label>Show Balances</label><select id="showBalancesToggle" onchange="updateShowBalances()"><option value="true">Show</option><option value="false">Hide</option></select></div><div class="input-group"><label>Default Gas Speed</label><select id="gasSpeed" onchange="state.settings.gasSpeed=this.value"><option value="slow">Slow</option><option value="average" selected>Average</option><option value="fast">Fast</option></select></div><button class="btn btn-outline btn-sm" onclick="clearActivity()">🗑️ Clear Activity Log</button><div class="modal-actions"><button class="btn btn-primary btn-sm" onclick="closeModal('settingsModal')">Close</button></div></div></div>
+    <div class="modal-overlay" id="txDetailModal" style="display:none;"><div class="modal"><h3>🧾 Transaction Details</h3><div id="txDetailContent"></div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('txDetailModal')">Close</button></div></div></div>
+    <div class="shortcuts-overlay" id="shortcutsOverlay" style="display:none;" onclick="this.style.display='none'"><div class="shortcuts-card"><h3 style="font-family:var(--font-mono);margin-bottom:10px;font-weight:500;">⌨️ Keyboard Shortcuts</h3><div style="display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);font-size:12px;"><div><kbd style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">S</kbd> Open Send</div><div><kbd style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">R</kbd> Open Receive</div><div><kbd style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">W</kbd> Open Swap</div><div><kbd style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">Esc</kbd> Close modal</div><div><kbd style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">?</kbd> Show this help</div></div></div></div>
+    <div class="modal-overlay" id="statusModal" style="display:none;"><div class="modal"><h3>📡 System Status</h3><div class="status-row"><span class="status-dot-green"></span><span>Ethereum Node</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>API Gateway</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>Transaction Relay</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>Database Cluster</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>CDN & Frontend</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><p style="text-align:center;color:var(--green);margin-top:12px;font-weight:500;">✅ All Systems Operational</p><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('statusModal')">Close</button></div></div></div>
+    <div id="toastContainer"></div>
+    <div class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+    <script>
+        function toggleMobileNav() { document.getElementById('navLinks').classList.toggle('open'); }
+        (function() {
+            const state = {
+                connected: false, address: '', domain: '',
+                balances: { ETH:{amount:0,usd:0}, USDC:{amount:0,usd:0}, MATIC:{amount:0,usd:0}, UNI:{amount:0,usd:0}, LINK:{amount:0,usd:0}, AAVE:{amount:0,usd:0} },
+                transactions: [], totalBalance:0, txCount:0, gasSaved:0, streak:0,
+                settings: { showBalances:true, gasSpeed:'average' },
+                addressBook: [], donations:847000,
+                balanceHistory: [],
+                priceHistory: { ETH:[], USDC:[], MATIC:[], UNI:[], LINK:[], AAVE:[] },
+                priceRange: '30D', selectedPriceToken: 'ETH'
+            };
+            const prices = { ETH:3450, USDC:1.0, MATIC:0.72, UNI:8.5, LINK:14.5, AAVE:95 };
+            const landingPage = document.getElementById('landingPage');
+            const dashboardPage = document.getElementById('dashboardPage');
+            const walletDisplay = document.getElementById('walletAddressDisplay');
+            const walletDot = document.getElementById('walletDot');
+            const totalBalEl = document.getElementById('totalBalance');
+            const changeEl = document.getElementById('balanceChange');
+            const tokenListEl = document.getElementById('tokenList');
+            const txListEl = document.getElementById('txList');
+            const receiveAddrEl = document.getElementById('receiveAddress');
+            const statTxEl = document.getElementById('statTx');
+            const statGasEl = document.getElementById('statGas');
+            const statStreakEl = document.getElementById('statStreak');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+            function generateBalanceHistory(total){const data=[];let val=total*0.7;const now=new Date();for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);val+=val*(Math.random()*0.08-0.02);val=Math.max(val,total*0.5);data.push({date:d,value:val});}data[data.length-1]={date:new Date(),value:total};return data;}
+            function generatePriceHistory(basePrice){const data=[];let val=basePrice;const now=new Date();for(let i=89;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);val+=val*(Math.random()*0.06-0.025);val=Math.max(val,basePrice*0.5);data.push({date:d,value:val});}data[data.length-1]={date:new Date(),value:basePrice};return data;}
+
+            function updateUI(){
+                if(!dashboardPage.classList.contains('active'))return;
+                const show=state.settings.showBalances;
+                totalBalEl.textContent=show?'$'+state.totalBalance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'****';
+                const cp=state.totalBalance>0?(Math.random()*8-2).toFixed(2):'0.00';const cv=parseFloat(cp);
+                changeEl.textContent=(cv>=0?'▲ ':'▼ ')+Math.abs(cv).toFixed(2)+'%';
+                changeEl.style.color=cv>=0?'var(--green)':'var(--red)';
+                changeEl.style.background=cv>=0?'var(--green-muted)':'var(--red-muted)';
+
+                const tokens=[{name:'Ethereum',sym:'ETH',icon:'⟠',data:state.balances.ETH,color:'#627eea'},{name:'USD Coin',sym:'USDC',icon:'$',data:state.balances.USDC,color:'#2775ca'},{name:'Polygon',sym:'MATIC',icon:'◆',data:state.balances.MATIC,color:'#8247e5'},{name:'Uniswap',sym:'UNI',icon:'🦄',data:state.balances.UNI,color:'#ff007a'},{name:'Chainlink',sym:'LINK',icon:'🔗',data:state.balances.LINK,color:'#2a5ada'},{name:'Aave',sym:'AAVE',icon:'👻',data:state.balances.AAVE,color:'#b6509e'}];
+
+                tokenListEl.innerHTML=tokens.map(t=>{
+                    const sparkData=(state.priceHistory[t.sym]||[]).slice(-7);
+                    const sparkPts=sparkData.length>1?sparkData.map((d,i)=>{const minV=Math.min(...sparkData.map(x=>x.value));const maxV=Math.max(...sparkData.map(x=>x.value));const range=maxV-minV||1;return`${(i/(sparkData.length-1)*100).toFixed(1)},${(100-(d.value-minV)/range*100).toFixed(1)}`;}).join(' '):'0,50 100,50';
+                    const change7d=sparkData.length>1?((sparkData[sparkData.length-1].value-sparkData[0].value)/sparkData[0].value*100):0;
+                    return`<div class="token-row" onmouseenter="highlightTokenSpark('${t.sym}')" onmouseleave="unhighlightTokenSpark('${t.sym}')"><div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;font-size:12px;">${t.icon}</div><div><div style="font-weight:500;">${t.name}</div><div style="font-size:9px;color:var(--text-muted);">${t.sym}</div></div></div><svg class="mini-sparkline" id="spark-${t.sym}" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="${sparkPts}" fill="none" stroke="${t.color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><div style="text-align:right;"><div style="font-family:var(--font-mono);font-weight:500;font-size:12px;">${show?t.data.amount.toFixed(4):'***'}</div><div style="font-size:9px;color:var(--text-muted);">${show?'$'+t.data.usd.toFixed(2):'***'}</div><div style="font-size:8px;color:${change7d>=0?'var(--green)':'var(--red)'};">${change7d>=0?'▲':'▼'}${Math.abs(change7d).toFixed(1)}%</div></div></div>`;}).join('');
+
+                const maxUsd=Math.max(...tokens.map(t=>t.data.usd),1);
+                document.getElementById('tokenBars').innerHTML=tokens.map(t=>`<div class="token-bar-row"><div class="token-bar-label">${t.sym}</div><div class="token-bar-track" onmouseenter="showBarTooltip(event,'${t.sym}','$${t.data.usd.toFixed(0)}','${(t.data.usd/state.totalBalance*100).toFixed(1)}%')" onmouseleave="hideBarTooltip()"><div class="token-bar-fill" style="width:${(t.data.usd/maxUsd*100).toFixed(1)}%;background:${t.color};" data-pct="${(t.data.usd/state.totalBalance*100).toFixed(1)}%"></div></div><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">${show?'$'+t.data.usd.toFixed(0):'***'}</div></div>`).join('');
+
+                if(state.transactions.length===0){txListEl.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:18px;">No transactions yet.</p>';}
+                else{txListEl.innerHTML=state.transactions.map((tx,i)=>`<div class="tx-item" onclick="openTxDetail(${i})"><div style="display:flex;align-items:center;gap:7px;"><span style="color:${tx.type==='sent'?'var(--red)':'var(--green)'};">${tx.type==='sent'?'↗':'↙'}</span><div><div style="font-weight:500;">${tx.type==='sent'?'Sent':'Received'} ${tx.token}</div><div style="font-size:8px;color:var(--text-muted);">${tx.address}</div></div></div><div style="font-family:var(--font-mono);color:${tx.type==='sent'?'var(--red)':'var(--green)'};font-size:12px;">${tx.type==='sent'?'-':'+'}${tx.amount} ${tx.token}</div></div>`).join('');}
+
+                statTxEl.textContent=state.txCount;statGasEl.textContent='$'+state.gasSaved.toFixed(2);statStreakEl.textContent=state.streak+'d';
+                document.getElementById('statPortfolioValue').textContent='$'+state.totalBalance.toLocaleString('en-US',{minimumFractionDigits:2});
+                const best=tokens.reduce((a,b)=>a.data.usd>b.data.usd?a:b);document.getElementById('statBestAsset').textContent=best.sym;
+                const lt=state.transactions[0];document.getElementById('statLastActivity').textContent=lt?timeAgo(new Date(Date.now()-Math.random()*10000000)):'—';
+                updateDonutChart();updateAddressBook();updateTicker();updateGasGauge();renderBalanceChart();renderPriceChart();
+            }
+            function timeAgo(d){const s=Math.floor((new Date()-d)/1000);if(s<60)return'Just now';const m=Math.floor(s/60);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+
+            function updateDonutChart(){
+                const tokens=['ETH','USDC','MATIC','UNI','LINK','AAVE'];const colors=['#627eea','#2775ca','#8247e5','#ff007a','#2a5ada','#b6509e'];const names=['Ethereum','USD Coin','Polygon','Uniswap','Chainlink','Aave'];const total=state.totalBalance;const cd=document.getElementById('donutChart');
+                if(total===0){cd.innerHTML='<p style="color:var(--text-muted);">No balance data</p>';return;}
+                const circ=2*Math.PI*45;let offset=0;const segments=[];
+                tokens.forEach((t,i)=>{const v=state.balances[t].usd;const pct=v/total;const dash=circ*pct;const co=offset;segments.push({token:t,name:names[i],color:colors[i],value:v,pct,dash,offset:co});offset+=dash;});
+                cd.innerHTML=`<div style="position:relative;display:flex;align-items:center;justify-content:center;"><svg class="chart-svg" viewBox="0 0 100 100" style="transform:rotate(-90deg);"><circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="6"/>${segments.map(s=>`<circle cx="50" cy="50" r="45" fill="none" stroke="${s.color}" stroke-width="6" stroke-dasharray="${s.dash} ${circ-s.dash}" stroke-dashoffset="${-s.offset}" class="chart-segment" data-token="${s.token}" data-value="$${s.value.toFixed(0)}" data-pct="${(s.pct*100).toFixed(1)}%" data-name="${s.name}" onmouseenter="donutHover(event,this)" onmouseleave="donutLeave()"/>`).join('')}<circle cx="50" cy="50" r="20" fill="var(--bg-card)"/><text x="50" y="47" class="donut-centre-text" id="donutCentreText">$${total.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</text><text x="50" y="58" class="donut-centre-sub" id="donutCentreSub">Total</text></svg></div><div class="chart-legend">${segments.map(s=>`<div><span class="legend-dot" style="background:${s.color};"></span>${s.name} ${(s.pct*100).toFixed(1)}%</div>`).join('')}</div>`;
+            }
+            window.donutHover=function(e,el){el.setAttribute('stroke-width','8');const name=el.getAttribute('data-name');const value=el.getAttribute('data-value');const pct=el.getAttribute('data-pct');document.getElementById('donutCentreText').textContent=value;document.getElementById('donutCentreSub').textContent=name+' ('+pct+')';const tt=document.createElement('div');tt.className='chart-tooltip visible';tt.id='donutTooltip';tt.innerHTML=`<div class="tt-label">${name}</div><div class="tt-value">${value}</div><div>${pct} of portfolio</div>`;tt.style.position='fixed';tt.style.left=(e.clientX+10)+'px';tt.style.top=(e.clientY-35)+'px';document.body.appendChild(tt);};
+            window.donutLeave=function(){document.querySelectorAll('.chart-segment').forEach(s=>s.setAttribute('stroke-width','6'));const total=state.totalBalance;document.getElementById('donutCentreText').textContent='$'+total.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});document.getElementById('donutCentreSub').textContent='Total';const tt=document.getElementById('donutTooltip');if(tt)tt.remove();};
+            document.addEventListener('mousemove',function(e){const tt=document.getElementById('donutTooltip');if(tt){tt.style.left=(e.clientX+10)+'px';tt.style.top=(e.clientY-35)+'px';}});
+
+            function renderBalanceChart(){
+                const data=state.balanceHistory;if(!data||data.length<2)return;
+                const svg=document.getElementById('areaChartSvg');const tooltip=document.getElementById('areaTooltip');
+                const w=600,h=220,pad={top:20,right:30,bottom:30,left:40};const chartW=w-pad.left-pad.right,chartH=h-pad.top-pad.bottom;
+                const minV=Math.min(...data.map(d=>d.value))*0.95;const maxV=Math.max(...data.map(d=>d.value))*1.05;
+                const scaleX=(i)=>pad.left+(i/(data.length-1))*chartW;const scaleY=(v)=>pad.top+chartH-((v-minV)/(maxV-minV))*chartH;
+                const points=data.map((d,i)=>`${scaleX(i).toFixed(1)},${scaleY(d.value).toFixed(1)}`).join(' ');
+                const areaPath=`M${scaleX(0)},${pad.top+chartH} L${points} L${scaleX(data.length-1)},${pad.top+chartH} Z`;
+                const gridY=[minV+(maxV-minV)*0.25,minV+(maxV-minV)*0.5,minV+(maxV-minV)*0.75];
+                svg.innerHTML=`<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6c5ce7" stop-opacity="0.25"/><stop offset="100%" stop-color="#6c5ce7" stop-opacity="0.01"/></linearGradient></defs>${gridY.map(v=>`<line x1="${pad.left}" y1="${scaleY(v).toFixed(1)}" x2="${w-pad.right}" y2="${scaleY(v).toFixed(1)}" class="area-grid-line"/>`).join('')}<path d="${areaPath}" fill="url(#areaGrad)" class="area-fill"/><polyline points="${points}" class="area-line" stroke-dasharray="800" stroke-dashoffset="800" style="animation:sparkline-draw 1.6s ease forwards;"/>`;
+                const style=document.createElement('style');style.textContent=`@keyframes sparkline-draw{to{stroke-dashoffset:0;}}`;if(!document.querySelector('#sparkline-keyframes')){style.id='sparkline-keyframes';document.head.appendChild(style);}
+                svg.onmousemove=function(e){const rect=svg.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*w;const idx=Math.round((mx-pad.left)/chartW*(data.length-1));const clamped=Math.max(0,Math.min(data.length-1,idx));const d=data[clamped];const sx=scaleX(clamped),sy=scaleY(d.value);const existingLine=svg.querySelector('.area-hover-line');const existingDot=svg.querySelector('.area-hover-dot');if(existingLine)existingLine.setAttribute('x1',sx);else{const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('class','area-hover-line');l.setAttribute('x1',sx);l.setAttribute('x2',sx);l.setAttribute('y1',pad.top);l.setAttribute('y2',pad.top+chartH);svg.appendChild(l);}if(existingDot){existingDot.setAttribute('cx',sx);existingDot.setAttribute('cy',sy);}else{const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('class','area-hover-dot');c.setAttribute('r','4');c.setAttribute('cx',sx);c.setAttribute('cy',sy);svg.appendChild(c);}const change=data.length>1?((d.value-data[0].value)/data[0].value*100):0;tooltip.innerHTML=`<div class="tt-label">${d.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div><div class="tt-value">$${d.value.toLocaleString('en-US',{minimumFractionDigits:0})}</div><div style="font-size:9px;color:${change>=0?'var(--green)':'var(--red)'};">${change>=0?'▲':'▼'}${Math.abs(change).toFixed(1)}%</div>`;tooltip.classList.add('visible');tooltip.style.left=Math.min(e.clientX-rect.left+8,rect.width-130)+'px';tooltip.style.top=Math.max(0,e.clientY-rect.top-60)+'px';};
+                svg.onmouseleave=function(){tooltip.classList.remove('visible');const l=svg.querySelector('.area-hover-line');if(l)l.remove();const d=svg.querySelector('.area-hover-dot');if(d)d.remove();};
+            }
+
+            function renderPriceChart(){
+                const token=document.getElementById('priceTokenSelect').value;const range=state.priceRange;state.selectedPriceToken=token;
+                const fullData=state.priceHistory[token]||[];let days=range==='7D'?7:range==='30D'?30:90;const data=fullData.slice(-days);
+                if(!data||data.length<2)return;const svg=document.getElementById('priceChartSvg');const tooltip=document.getElementById('priceTooltip');
+                const w=600,h=200,pad={top:15,right:25,bottom:25,left:35};const chartW=w-pad.left-pad.right,chartH=h-pad.top-pad.bottom;
+                const minV=Math.min(...data.map(d=>d.value))*0.95;const maxV=Math.max(...data.map(d=>d.value))*1.05;
+                const scaleX=(i)=>pad.left+(i/(data.length-1))*chartW;const scaleY=(v)=>pad.top+chartH-((v-minV)/(maxV-minV))*chartH;
+                const points=data.map((d,i)=>`${scaleX(i).toFixed(1)},${scaleY(d.value).toFixed(1)}`).join(' ');
+                svg.innerHTML=`<defs><linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6c5ce7" stop-opacity="0.2"/><stop offset="100%" stop-color="#6c5ce7" stop-opacity="0.01"/></linearGradient></defs><path d="M${scaleX(0)},${pad.top+chartH} L${points} L${scaleX(data.length-1)},${pad.top+chartH} Z" fill="url(#priceGrad)"/><polyline points="${points}" fill="none" stroke="#6c5ce7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svg.onmousemove=function(e){const rect=svg.getBoundingClientRect();const mx=(e.clientX-rect.left)/rect.width*w;const idx=Math.round((mx-pad.left)/chartW*(data.length-1));const clamped=Math.max(0,Math.min(data.length-1,idx));const d=data[clamped];tooltip.innerHTML=`<div class="tt-label">${d.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div><div class="tt-value">$${d.value.toFixed(2)}</div>`;tooltip.classList.add('visible');tooltip.style.left=Math.min(e.clientX-rect.left+6,rect.width-120)+'px';tooltip.style.top=Math.max(0,e.clientY-rect.top-50)+'px';};
+                svg.onmouseleave=function(){tooltip.classList.remove('visible');};
+            }
+            window.setPriceRange=function(range,btn){state.priceRange=range;document.querySelectorAll('#timeToggle .time-toggle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderPriceChart();};
+            window.highlightTokenSpark=function(sym){const el=document.getElementById('spark-'+sym);if(el)el.style.filter='brightness(1.6)';};
+            window.unhighlightTokenSpark=function(sym){const el=document.getElementById('spark-'+sym);if(el)el.style.filter='';};
+            window.showBarTooltip=function(e,sym,value,pct){const tt=document.createElement('div');tt.className='chart-tooltip visible';tt.id='barTooltip';tt.innerHTML=`<div class="tt-label">${sym}</div><div class="tt-value">${value}</div><div>${pct} of portfolio</div>`;tt.style.position='fixed';tt.style.left=(e.clientX+8)+'px';tt.style.top=(e.clientY-30)+'px';document.body.appendChild(tt);};
+            window.hideBarTooltip=function(){const tt=document.getElementById('barTooltip');if(tt)tt.remove();};
+            document.addEventListener('mousemove',function(e){const tt=document.getElementById('barTooltip');if(tt){tt.style.left=(e.clientX+8)+'px';tt.style.top=(e.clientY-30)+'px';}});
+            document.addEventListener('click',function(e){const bar=e.target.closest('.fee-comp-bar');if(bar){bar.style.transform='scale(1.03)';setTimeout(()=>bar.style.transform='',180);const label=bar.closest('.fee-comp-row')?.querySelector('.fee-comp-label')?.textContent||'';showToast(`📊 ${label}: ${bar.textContent} transfer fee`,'success');}});
+
+            function updateGasGauge(){const gc=document.getElementById('gasGaugeContainer');const val=Math.min(state.gasSaved,50);const angle=(val/50)*180;const rad=(angle-90)*Math.PI/180;const r=34;const cx=50;const cy=44;const x=cx+r*Math.cos(rad);const y=cy+r*Math.sin(rad);const large=angle>90?1:0;const dash=(angle/180)*Math.PI*r*2;gc.innerHTML=`<svg class="gauge-svg" viewBox="0 0 100 56"><path d="M 16 44 A 34 34 0 ${large} 1 ${x.toFixed(1)} ${y.toFixed(1)}" class="gauge-bg"/><path d="M 16 44 A 34 34 0 ${large} 1 ${x.toFixed(1)} ${y.toFixed(1)}" class="gauge-fill" stroke-dasharray="${dash} 260" stroke-dashoffset="260" style="animation:gauge-fill 1.2s ease forwards;"/><text x="50" y="48" class="gauge-value">$${state.gasSaved.toFixed(1)}</text></svg>`;const gs=document.createElement('style');gs.textContent=`@keyframes gauge-fill{to{stroke-dashoffset:0;}}`;document.head.appendChild(gs);}
+            function updateTicker(){const te=document.getElementById('tickerTrack');const items=[{sym:'ETH',price:prices.ETH,change:2.4},{sym:'USDC',price:prices.USDC,change:0},{sym:'MATIC',price:prices.MATIC,change:-1.1},{sym:'UNI',price:prices.UNI,change:5.7},{sym:'LINK',price:prices.LINK,change:-0.8},{sym:'AAVE',price:prices.AAVE,change:3.2}];te.innerHTML=items.concat(items).map(i=>`<div class="ticker-item"><span>${i.sym}</span><span>$${i.price.toFixed(2)}</span><span class="${i.change>=0?'up':'down'}">${i.change>=0?'▲':'▼'}${Math.abs(i.change).toFixed(1)}%</span></div>`).join('');}
+            function updateAddressBook(){const list=document.getElementById('addressBookList');list.innerHTML=state.addressBook.map((e,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-input);padding:6px 9px;border-radius:6px;cursor:pointer;" onclick="copyAddressBook(${i})"><span style="font-size:11px;">${e.label}</span><span style="font-size:8px;color:var(--text-muted);">${e.address.slice(0,10)}...</span></div>`).join('');}
+
+            function finalizeConnection(address,displayAddr){
+                state.connected=true;state.address=address;state.domain=displayAddr||address;
+                state.balances={ETH:{amount:2.45,usd:2.45*prices.ETH},USDC:{amount:3500,usd:3500},MATIC:{amount:1200,usd:1200*prices.MATIC},UNI:{amount:85,usd:85*prices.UNI},LINK:{amount:150,usd:150*prices.LINK},AAVE:{amount:12,usd:12*prices.AAVE}};
+                state.totalBalance=Object.values(state.balances).reduce((s,b)=>s+b.usd,0);state.txCount=12;state.gasSaved=34.5;state.streak=7;
+                state.transactions=[{type:'received',token:'ETH',amount:'0.85',address:'0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'},{type:'sent',token:'USDC',amount:'500',address:'0x9F8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e'},{type:'received',token:'MATIC',amount:'300',address:'0xb0b.crypto'},{type:'sent',token:'ETH',amount:'0.15',address:'0x4C5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d'},{type:'received',token:'UNI',amount:'25',address:'0x7B3a4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b'},{type:'sent',token:'USDC',amount:'200',address:'0xcarol.eth'}];
+                state.balanceHistory=generateBalanceHistory(state.totalBalance);
+                const tokens=['ETH','USDC','MATIC','UNI','LINK','AAVE'];tokens.forEach(t=>{state.priceHistory[t]=generatePriceHistory(prices[t]);});
+                showSkeletonLoading(()=>{landingPage.classList.add('hidden');dashboardPage.classList.add('active');walletDisplay.textContent=state.domain.length>16?state.domain.slice(0,14)+'...':state.domain;walletDot.style.background='var(--green)';receiveAddrEl.textContent=state.address;updateUI();});
+            }
+            function showSkeletonLoading(cb){const o=document.createElement('div');o.className='skeleton-overlay';o.innerHTML='<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>';document.body.appendChild(o);setTimeout(()=>{o.remove();cb();},700);}
+            function disconnect(){state.connected=false;state.address='';state.domain='';state.balances={ETH:{amount:0,usd:0},USDC:{amount:0,usd:0},MATIC:{amount:0,usd:0},UNI:{amount:0,usd:0},LINK:{amount:0,usd:0},AAVE:{amount:0,usd:0}};state.totalBalance=0;state.transactions=[];state.txCount=0;state.gasSaved=0;state.streak=0;state.balanceHistory=[];state.priceHistory={ETH:[],USDC:[],MATIC:[],UNI:[],LINK:[],AAVE:[]};landingPage.classList.remove('hidden');dashboardPage.classList.remove('active');walletDisplay.textContent='Not Connected';walletDot.style.background='var(--text-muted)';receiveAddrEl.textContent='0xNotConnected';}
+
+            window.handleWalletClick=function(){if(state.connected){if(confirm('Disconnect wallet?'))disconnect();}else openConnectModal();};
+            window.openConnectModal=function(){document.getElementById('connectModal').style.display='flex';};
+            window.connectWithSeed=function(){const w=document.getElementById('seedInput').value.trim();if(w.split(/\s+/).length<12){showToast('❌ Please enter all 12 words.','error');return;}const fa='0x'+Array.from({length:40},()=>Math.floor(Math.random()*16).toString(16)).join('');finalizeConnection(fa,'seed-connected.crypto');closeModal('connectModal');document.getElementById('seedInput').value='';showToast('🔑 Wallet connected successfully','success');};
+            window.closeModal=function(id){document.getElementById(id).style.display='none';};
+            window.openSendModal=function(){if(!state.connected){showToast('⚠️ Connect first!','error');return;}document.getElementById('sendModal').style.display='flex';updateFeeEstimate();};
+            window.openReceiveModal=function(){if(!state.connected){showToast('⚠️ Connect first!','error');return;}receiveAddrEl.textContent=state.address;document.getElementById('receiveModal').style.display='flex';};
+            window.openSwapModal=function(){if(!state.connected){showToast('⚠️ Connect first!','error');return;}document.getElementById('swapModal').style.display='flex';};
+            window.updateFeeEstimate=function(){const amt=parseFloat(document.getElementById('sendAmount').value)||0;const est=(Math.random()*2.5+1).toFixed(2);document.getElementById('feeAmount').textContent='~$'+est;};
+            window.confirmSend=function(){const token=document.getElementById('sendToken').value;const addr=document.getElementById('sendAddress').value.trim();const amount=parseFloat(document.getElementById('sendAmount').value);if(!addr){showToast('❌ Enter recipient','error');return;}if(!amount||amount<=0){showToast('❌ Invalid amount','error');return;}if(amount>state.balances[token].amount){showToast('❌ Insufficient balance','error');return;}state.balances[token].amount-=amount;state.balances[token].usd=state.balances[token].amount*prices[token];state.totalBalance=Object.values(state.balances).reduce((s,b)=>s+b.usd,0);state.transactions.unshift({type:'sent',token,amount:amount.toFixed(2),address:addr.length>14?addr.slice(0,12)+'...':addr});state.txCount++;updateUI();closeModal('sendModal');document.getElementById('sendAmount').value='';document.getElementById('sendAddress').value='';showToast(`✅ Sent ${amount} ${token} (0% fee)`,'success');};
+            window.confirmSwap=function(){const from=document.getElementById('swapFrom').value;const to=document.getElementById('swapTo').value;const amount=parseFloat(document.getElementById('swapAmount').value);if(!amount||amount<=0){showToast('❌ Invalid amount','error');return;}if(from===to){showToast('❌ Same token','error');return;}if(amount>state.balances[from].amount){showToast('❌ Insufficient balance','error');return;}const rate=prices[from]/prices[to];const received=amount*rate*0.995;state.balances[from].amount-=amount;state.balances[from].usd=state.balances[from].amount*prices[from];state.balances[to].amount+=received;state.balances[to].usd=state.balances[to].amount*prices[to];state.totalBalance=Object.values(state.balances).reduce((s,b)=>s+b.usd,0);state.txCount++;state.gasSaved+=parseFloat((Math.random()*2.5+0.8).toFixed(2));state.transactions.unshift({type:'sent',token:from,amount:amount.toFixed(2),address:'🔄 Swap'});state.transactions.unshift({type:'received',token:to,amount:received.toFixed(4),address:'🔄 Swap'});updateUI();closeModal('swapModal');document.getElementById('swapAmount').value='';showToast(`🔄 Swapped ${amount} ${from} → ${received.toFixed(4)} ${to} (0% fee)`,'success');};
+            window.copyAddress=function(){if(!state.connected)return;navigator.clipboard.writeText(state.address).then(()=>showToast('📋 Copied!','success')).catch(()=>showToast('⚠️ Could not copy','error'));};
+            window.openSettingsModal=()=>document.getElementById('settingsModal').style.display='flex';
+            window.updateShowBalances=function(){state.settings.showBalances=document.getElementById('showBalancesToggle').value==='true';updateUI();};
+            window.clearActivity=function(){state.transactions=[];updateUI();showToast('🗑️ Activity log cleared','success');};
+            window.openTxDetail=function(index){const tx=state.transactions[index];if(!tx)return;const gas=(Math.random()*0.012+0.001).toFixed(5);const hash='0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('');document.getElementById('txDetailContent').innerHTML=`<p><strong>Type:</strong> ${tx.type==='sent'?'Sent':'Received'} ${tx.token}</p><p><strong>Amount:</strong> ${tx.amount} ${tx.token}</p><p><strong>To/From:</strong> <span style="font-family:var(--font-mono);">${tx.address}</span></p><p><strong>Gas Fee:</strong> ${gas} ETH</p><p><strong>Timestamp:</strong> ${new Date(Date.now()-index*300000).toLocaleString()}</p><a href="https://etherscan.io/tx/${hash}" target="_blank" class="btn btn-outline btn-sm" style="margin-top:7px;">🔗 View on Etherscan</a>`;document.getElementById('txDetailModal').style.display='flex';};
+            window.saveAddress=function(){const label=prompt('Enter a label for this address:');if(label){state.addressBook.push({label,address:state.address});updateAddressBook();showToast('💾 Address saved!','success');}};
+            window.copyAddressBook=function(index){navigator.clipboard.writeText(state.addressBook[index].address).then(()=>showToast('📋 Address copied!','success'));};
+            window.donate=function(amount){state.donations+=amount;document.getElementById('donationsValue').textContent='$'+(state.donations/1000).toFixed(0)+'K';showToast(`❤️ Thank you for donating $${amount}!`,'success');};
+            window.donateCustom=function(){const val=parseInt(document.getElementById('customDonation').value);if(val>0)donate(val);else showToast('❌ Enter a valid amount','error');};
+            window.subscribe=function(){const email=document.getElementById('subscribeEmail').value;if(email)showToast('📧 Subscribed! (simulated)','success');else showToast('❌ Enter email','error');};
+            window.openStatusModal=function(){document.getElementById('statusModal').style.display='flex';};
+
+            function updateClock(){const el=document.getElementById('dashboardClock');if(el)el.textContent=new Date().toLocaleString();}
+            setInterval(updateClock,1000);
+            let block=19847256;setInterval(()=>{block++;document.getElementById('blockNumber').textContent='#'+block.toLocaleString();},15000);
+            let gwei=24;setInterval(()=>{gwei=Math.floor(Math.random()*28+12);document.getElementById('gasPrice').textContent='⚡'+gwei+' gwei';},10000);
+
+            document.addEventListener('click',function(e){const btn=e.target.closest('.ripple-container');if(btn){const ripple=document.createElement('span');ripple.className='ripple-effect';const rect=btn.getBoundingClientRect();ripple.style.left=(e.clientX-rect.left)+'px';ripple.style.top=(e.clientY-rect.top)+'px';btn.appendChild(ripple);setTimeout(()=>ripple.remove(),500);}});
+            document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;if(e.key==='s'||e.key==='S'){openSendModal();e.preventDefault();}if(e.key==='r'||e.key==='R'){openReceiveModal();e.preventDefault();}if(e.key==='w'||e.key==='W'){openSwapModal();e.preventDefault();}if(e.key==='?'){document.getElementById('shortcutsOverlay').style.display='flex';e.preventDefault();}if(e.key==='Escape'){document.querySelectorAll('.modal-overlay,.shortcuts-overlay').forEach(m=>m.style.display='none');}});
+
+            function showToast(msg,type){const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(110%)';t.style.transition='0.25s';setTimeout(()=>t.remove(),250);},2600);}
+            window.toggleFaq=function(el){const answer=el.nextElementSibling;const isOpen=answer.classList.contains('open');document.querySelectorAll('.faq-answer').forEach(a=>a.classList.remove('open'));if(!isOpen)answer.classList.add('open');};
+            document.addEventListener('click',e=>{if(e.target.classList.contains('modal-overlay'))e.target.style.display='none';});
+            window.addEventListener('scroll',()=>{scrollTopBtn.classList.toggle('visible',window.scrollY>500);});
+
+            function animateFeeBars(){document.querySelectorAll('.fee-comp-bar').forEach(bar=>{const target=parseFloat(bar.getAttribute('data-target'));bar.style.width=target+'%';});}
+            const feeObserver=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){animateFeeBars();feeObserver.unobserve(e.target);}});},{threshold:0.3});
+            const feeSection=document.getElementById('feeComparison');if(feeSection)feeObserver.observe(feeSection);
+            updateUI();
+        })();
+    </script>
+</body>
+</html>
