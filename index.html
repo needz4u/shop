@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Invo — Zero Fees • Crypto Made Simple</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236c5ce7'/><stop offset='100%25' stop-color='%23a78bfa'/></linearGradient></defs><polygon points='18,2 33,11 33,25 18,34 3,25 3,11' fill='url(%23g)' stroke='white' stroke-width='1.5' stroke-linejoin='round'/><path d='M18 12v12M12 18h12' stroke='white' stroke-width='2.5' stroke-linecap='round'/></svg>" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0e1a;
+            --bg-surface: rgba(17, 22, 39, 0.78);
+            --bg-card: rgba(17, 22, 39, 0.78);
+            --bg-header: rgba(14, 18, 33, 0.88);
+            --bg-input: rgba(13, 17, 32, 0.9);
+            --bg-modal: rgba(15, 17, 23, 0.92);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --text-primary: #f0f1f5;
+            --text-secondary: #b0b3c0;
+            --text-muted: #8a8d98;
+            --accent: #6c5ce7;
+            --accent-hover: #7b6ff0;
+            --accent-soft: #a78bfa;
+            --accent-dim: rgba(108, 92, 231, 0.15);
+            --green: #00a878;
+            --green-muted: rgba(0, 168, 120, 0.08);
+            --red: #e74c3c;
+            --gold: #f0a500;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.35);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.45);
+            --shadow-lg: 0 20px 55px rgba(0, 0, 0, 0.6);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --glow-alpha: 0.12;
+            --blur-mult: 1;
+            --anim-speed: 1;
+        }
+        body.glow-low {
+            --glow-alpha: 0.04;
+        }
+        body.glow-high {
+            --glow-alpha: 0.25;
+        }
+        body.blur-low {
+            --blur-mult: 0.5;
+        }
+        body.blur-high {
+            --blur-mult: 1.5;
+        }
+        body.speed-slow {
+            --anim-speed: 2;
+        }
+        body.speed-fast {
+            --anim-speed: 0.5;
+        }
+        body.reduce-motion * {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+        body.glass-off {
+            --bg-surface: rgba(17, 22, 39, 0.95);
+            --bg-card: rgba(17, 22, 39, 0.95);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.7;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background 0.5s;
+        }
+
+        #scrollProgress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+            z-index: 9999;
+            transition: width 0.2s;
+            max-width: 100%;
+        }
+
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-deep);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .preloader-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin calc(0.7s * var(--anim-speed)) linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .preloader-text {
+            margin-top: 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            color: var(--accent-soft);
+            letter-spacing: 2px;
+        }
+
+        canvas#particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at 30% 20%, rgba(108, 92, 231, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(0, 168, 120, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 16px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 0 0 8px 8px;
+            z-index: 999;
+            font-weight: 500;
+            text-decoration: none;
+            transition: top 0.3s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+
+        .main-header {
+            position: sticky;
+            top: 12px;
+            z-index: 100;
+            background: var(--bg-header);
+            backdrop-filter: blur(calc(24px * var(--blur-mult)));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 16px 28px;
+            margin-bottom: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: var(--shadow-md);
+            transition: background 0.3s;
+        }
+        .main-header.scrolled {
+            background: rgba(14, 18, 33, 0.95);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            flex-shrink: 0;
+        }
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6c5ce7, #a78bfa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.35);
+        }
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+        .logo-text {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .logo-text span {
+            color: #a78bfa;
+        }
+        .nav-links {
+            display: flex;
+            gap: 22px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .trust-pill {
+            background: var(--green-muted);
+            border: 1px solid rgba(0, 168, 120, 0.2);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+        }
+        .btn {
+            font-weight: 500;
+            font-size: 13px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: var(--font-sans);
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn:hover::after {
+            opacity: 1;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(108, 92, 231, 0.08);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #5b4bd1);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 28px rgba(108, 92, 231, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 15px;
+            border-radius: 14px;
+        }
+        .btn-sm {
+            font-size: 11px;
+            padding: 8px 16px;
+            min-height: 36px;
+        }
+        .header-status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .network-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .network-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                box-shadow: 0 0 4px rgba(0, 168, 120, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 12px rgba(0, 168, 120, 0.8);
+            }
+        }
+        .gas-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--gold);
+            background: rgba(240, 165, 0, 0.08);
+            border: 1px solid rgba(240, 165, 0, 0.2);
+            border-radius: 16px;
+            padding: 5px 10px;
+            white-space: nowrap;
+        }
+        .wallet-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 8px 16px 8px 8px;
+            cursor: pointer;
+        }
+        .wallet-badge .wallet-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+        .wallet-badge .wallet-address {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .hamburger {
+            display: none;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            line-height: 1;
+        }
+        .hamburger:hover {
+            border-color: var(--border-hover);
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+        .section-title {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 28px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(calc(24px * var(--blur-mult)));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at calc(var(--mouse-x, 0.5)*100%) calc(var(--mouse-y, 0.5)*100%),
+                    rgba(108, 92, 231, 0.05) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+        .card>* {
+            position: relative;
+            z-index: 1;
+        }
+        .card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+        }
+        .card-accent {
+            border-color: rgba(108, 92, 231, 0.2);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+        .hero h1 {
+            font-family: var(--font-mono);
+            font-size: 36px;
+            font-weight: 500;
+            line-height: 1.3;
+            max-width: 680px;
+            background: linear-gradient(135deg, #f0f1f5 0%, #a78bfa 50%, #6c5ce7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            max-width: 560px;
+        }
+        .zero-fees-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 168, 120, 0.07);
+            border: 1px solid rgba(0, 168, 120, 0.28);
+            border-radius: 30px;
+            padding: 13px 30px;
+            font-weight: 600;
+            color: var(--green);
+            font-size: 14px;
+            backdrop-filter: blur(12px);
+        }
+        .trust-stats {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 36px 40px;
+            margin-top: 36px;
+            box-shadow: var(--shadow-md);
+        }
+        .stat-item {
+            text-align: center;
+            min-width: 125px;
+        }
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 30px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #a78bfa, #6c5ce7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            margin-top: 8px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: var(--transition);
+        }
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 14px;
+        }
+        .feature-card h3 {
+            font-family: var(--font-mono);
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .fee-comparison-wrapper {
+            max-width: 680px;
+            margin: 0 auto 32px;
+        }
+        .fee-calculator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .fee-calculator input {
+            width: 120px;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+        }
+        .fee-calculator input:focus {
+            border-color: var(--accent);
+        }
+        .fee-comp-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition);
+            margin-bottom: 12px;
+        }
+        .fee-comp-card.invo-highlight {
+            border: 2px solid rgba(0, 168, 120, 0.35);
+            background: rgba(0, 168, 120, 0.04);
+            transform: scale(1.03);
+        }
+        .fee-comp-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .fee-comp-icon.green {
+            background: rgba(0, 168, 120, 0.15);
+            color: var(--green);
+        }
+        .fee-comp-icon.orange {
+            background: rgba(240, 165, 0, 0.15);
+            color: var(--gold);
+        }
+        .fee-comp-icon.red {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--red);
+        }
+        .fee-comp-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .fee-comp-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .fee-comp-rate {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .fee-comp-impact {
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .fee-comp-impact .loss {
+            color: var(--red);
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .fee-comp-bar-wrap {
+            flex: 1;
+            max-width: 160px;
+        }
+        .fee-comp-bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .fee-comp-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1.5s ease;
+        }
+        .fee-comp-bar-fill.green {
+            background: var(--green);
+        }
+        .fee-comp-bar-fill.orange {
+            background: var(--gold);
+        }
+        .fee-comp-bar-fill.red {
+            background: var(--red);
+        }
+        .fee-comp-save {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: right;
+        }
+        .fee-comp-save.green {
+            color: var(--green);
+        }
+        .yearly-loss {
+            background: rgba(231, 76, 60, 0.1);
+            border: 2px dashed rgba(231, 76, 60, 0.3);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-top: 12px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--red);
+        }
+
+        .roadmap-timeline {
+            position: relative;
+            padding: 30px 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
+            transform: translateX(-50%);
+        }
+        .milestone {
+            display: flex;
+            align-items: center;
+            margin-bottom: 44px;
+            position: relative;
+        }
+        .milestone.left {
+            justify-content: flex-start;
+        }
+        .milestone.right {
+            justify-content: flex-end;
+        }
+        .milestone-content {
+            width: 44%;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 26px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .milestone-content:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        .milestone-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        .milestone.green .milestone-dot {
+            background: var(--green);
+        }
+
+        .security-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(20, 25, 45, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .security-badge:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+            backdrop-filter: blur(6px);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: var(--bg-modal);
+            backdrop-filter: blur(28px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal h3 {
+            font-family: var(--font-mono);
+            margin-bottom: 20px;
+            font-size: 19px;
+            font-weight: 500;
+        }
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            z-index: 300;
+            font-weight: 500;
+            font-size: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--green);
+            animation: toastProgress 2.6s linear forwards;
+        }
+        @keyframes toastProgress {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+        .toast.success {
+            border-color: var(--green);
+            color: var(--green);
+        }
+        .toast.error {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .scroll-top {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c5ce7, #5b4bd1);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            z-index: 50;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .scroll-top:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .dashboard {
+            display: none;
+        }
+        .landing.hidden {
+            display: none;
+        }
+        .dashboard.active {
+            display: block;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        .balance-amount {
+            font-family: var(--font-mono);
+            font-size: 48px;
+            font-weight: 500;
+        }
+        .token-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .tx-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .area-chart-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            cursor: crosshair;
+        }
+        .area-chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+        .area-line {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+        }
+        .area-fill {
+            opacity: 0.2;
+        }
+        .chart-tooltip {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+            background: rgba(20, 25, 45, 0.95);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            opacity: 0;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+        }
+        .chart-tooltip.visible {
+            opacity: 1;
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            margin-top: 80px;
+            padding: 48px 0 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: var(--text-primary);
+        }
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 25, 45, 0.6);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .social-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .blog-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .blog-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+        .blog-card h4 {
+            font-family: var(--font-mono);
+            margin: 1rem 0 0.5rem;
+        }
+        .blog-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: var(--radius);
+            background: var(--bg-input);
+        }
+
+        .reviews-carousel {
+            position: relative;
+            min-height: 100px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .review-slide {
+            position: absolute;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transition: opacity 0.6s;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        .review-slide.active {
+            opacity: 1;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-search {
+            margin-bottom: 2rem;
+        }
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+        }
+        .faq-question {
+            padding: 18px 0;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        .faq-question:hover {
+            color: var(--accent);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+            padding-bottom: 18px;
+        }
+
+        .newsletter-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+        .newsletter-form {
+            display: flex;
+            gap: 10px;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+        .newsletter-form input {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            outline: none;
+        }
+        .newsletter-form input:focus {
+            border-color: var(--accent);
+        }
+
+        .settings-panel {
+            background: var(--bg-modal);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            max-width: 480px;
+            width: 90%;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked+.slider {
+            background: var(--accent);
+        }
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        .cookie-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-width: 500px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            z-index: 500;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        .cookie-banner.show {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
+        }
+        .partner-logo {
+            height: 65px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .partner-logo:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* ── Missing classes added ── */
+        .gradient-sep {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.3), transparent);
+            margin: 50px auto;
+            max-width: 600px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .step:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+        .step-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c5ce7, #a78bfa);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .step-content h4 {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .wallets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .wallet-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        .wallet-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .wallet-item .check {
+            color: var(--green);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        .testimonial {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            transition: var(--transition);
+        }
+        .testimonial:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        .testimonial-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .testimonial-author {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .donate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .donate-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .donate-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(108, 92, 231, 0.2);
+        }
+
+        .quarter-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+        .quarter-badge.done {
+            background: rgba(0, 168, 120, 0.15);
+            color: var(--green);
+        }
+        .quarter-badge.upcoming {
+            background: rgba(108, 92, 231, 0.12);
+            color: var(--accent-soft);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .dashboard-divider {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 22px 0;
+        }
+
+        .price-ticker {
+            overflow: hidden;
+            padding: 10px 0;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .ticker-track {
+            display: flex;
+            gap: 32px;
+            animation: tickerScroll 20s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes tickerScroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        .ticker-item {
+            display: inline-flex;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .ticker-item .up {
+            color: var(--green);
+        }
+        .ticker-item .down {
+            color: var(--red);
+        }
+
+        .donut-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .chart-svg {
+            width: 180px;
+            height: 180px;
+        }
+        .chart-segment {
+            transition: stroke-dasharray 0.6s, stroke-dashoffset 0.6s;
+        }
+        .donut-centre-text {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            fill: var(--text-primary);
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .legend-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        .mini-sparkline {
+            width: 70px;
+            height: 36px;
+            flex-shrink: 0;
+        }
+
+        .skeleton-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: rgba(10, 14, 26, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
+        .skeleton-card {
+            width: 340px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius);
+            animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .status-dot-green {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green);
+            flex-shrink: 0;
+        }
+
+        .dashboard-clock {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-bottom: 8px;
+        }
+
+        .fee-estimator {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .settings-gear {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.65;
+            margin-left: 8px;
+            transition: opacity 0.2s;
+        }
+        .settings-gear:hover {
+            opacity: 1;
+        }
+
+        @media (max-width:768px) {
+            .section {
+                padding: 60px 0;
+            }
+            .hero h1 {
+                font-size: 26px;
+            }
+            .trust-stats {
+                gap: 20px;
+                padding: 24px 16px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .milestone {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .milestone-content {
+                width: 88%;
+                margin-left: 24px;
+            }
+            .timeline-line {
+                left: 6px;
+            }
+            .milestone-dot {
+                left: 6px;
+                top: 16px;
+            }
+            .main-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 12px 18px;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                padding-top: 8px;
+                border-top: 1px solid var(--border);
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .hamburger {
+                display: block;
+                align-self: flex-end;
+            }
+            .modal {
+                padding: 24px 18px;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                margin-top: auto;
+            }
+            .modal-overlay {
+                align-items: flex-end;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width:480px) {
+            .hero {
+                padding: 40px 12px 24px;
+            }
+            .hero h1 {
+                font-size: 22px;
+            }
+            .card {
+                padding: 20px;
+            }
+            .btn {
+                min-height: 44px;
+                padding: 10px 18px;
+                font-size: 12px;
+            }
+            .fee-comp-card {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .fee-comp-bar-wrap {
+                max-width: 100%;
+                flex-basis: 100%;
+            }
+            .scroll-top {
+                right: 16px;
+                bottom: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="scrollProgress"></div>
+
+    <div class="preloader" id="preloader">
+        <div class="preloader-spinner"></div>
+        <div class="preloader-text">INVO</div>
+    </div>
+
+    <a href="#features" class="skip-link">Skip to content</a>
+    <canvas id="particleCanvas"></canvas>
+    <div class="bg-gradient"></div>
+
+    <div class="cookie-banner" id="cookieBanner">
+        <span style="font-size:12px; color:var(--text-secondary);">🍪 We use cookies for security & analytics.</span>
+        <button class="btn btn-sm btn-primary" onclick="acceptCookies()">Accept</button>
+    </div>
+
+    <div class="container">
+        <header class="main-header" id="mainHeader">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <a href="#" class="logo">
+                        <div class="logo-icon">
+                            <svg width="24" height="24" viewBox="0 0 36 36">
+                                <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+                                <polygon points="18,2 33,11 33,25 18,34 3,25 3,11" fill="url(#logoGrad)" stroke="white" stroke-width="1.5"/>
+                                <path d="M18 12v12M12 18h12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="logo-text">Invo<span>.</span></div>
+                    </a>
+                    <span style="font-size:9px; color:var(--accent-soft); background:rgba(108,92,231,0.08); border:1px solid rgba(108,92,231,0.15); border-radius:12px; padding:3px 10px; font-family:var(--font-mono);">⚡ Powered by Invo</span>
+                    <span style="font-size:9px; color:var(--green); background:rgba(0,168,120,0.08); border:1px solid rgba(0,168,120,0.15); border-radius:12px; padding:3px 10px; font-family:var(--font-mono);">✅ No KYC</span>
+                </div>
+                <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+            </div>
+            <nav class="nav-links" id="navLinks">
+                <a href="#features">Features</a><a href="#how-it-works">How It Works</a><a href="#wallets">Wallets</a><a href="#roadmap">Roadmap</a><a href="#blog">Blog</a><a href="#testimonials">Trust</a><a href="#faq">FAQ</a>
+                <span class="trust-pill">🛡️ Non‑Profit • Zero Fees</span>
+            </nav>
+            <div class="header-status-row">
+                <div class="network-badge"><div class="network-dot"></div><span>Ethereum Mainnet</span><span id="blockNumber" style="color:var(--accent-soft); margin-left:4px;">#19,847,256</span></div>
+                <div class="gas-badge" id="gasPrice">⚡ 24 gwei</div>
+                <div class="wallet-badge" id="walletBadge" onclick="handleWalletClick()"><div class="wallet-dot" id="walletDot"></div><span class="wallet-address" id="walletAddressDisplay">Not Connected</span></div>
+                <span class="settings-gear" onclick="openSettings()" aria-label="Settings">⚙️</span>
+            </div>
+        </header>
+
+        <div id="landingPage">
+            <section class="hero fade-in-up">
+                <div style="font-size:52px;">🔐</div>
+                <h1>Connect Unstoppable Wallet</h1>
+                <p>Your keys, your crypto — now with <strong>zero transfer fees</strong> forever.<br>Invo is a <strong>non‑profit organization</strong> built by the community, for the community.</p>
+                <div class="zero-fees-badge">🎉 0% TRANSFER FEES &nbsp;|&nbsp; 🌍 NON‑PROFIT &nbsp;|&nbsp; 🔒 SECURE</div>
+                <button class="btn btn-primary btn-lg" onclick="openConnectModal()">🔗 Connect Wallet</button>
+            </section>
+
+            <div class="trust-stats fade-in-up" id="trustStats">
+                <div class="stat-item"><div class="stat-value" data-target="2400000000" data-prefix="$" data-suffix="+">$2.4B+</div><div class="stat-label">Volume Processed</div></div>
+                <div class="stat-item"><div class="stat-value" data-target="780000" data-suffix="+">780K+</div><div class="stat-label">Community Members</div></div>
+                <div class="stat-item"><div class="stat-value">0%</div><div class="stat-label">Fees Forever</div></div>
+                <div class="stat-item"><div class="stat-value">24/7</div><div class="stat-label">Support</div></div>
+                <div class="stat-item"><div class="stat-value" id="donationsValue" data-target="847000" data-prefix="$" data-suffix="K">$847K</div><div class="stat-label">Community Donations</div></div>
+            </div>
+
+            <hr class="gradient-sep">
+
+            <section id="features" class="section fade-in-up"><h2 class="section-title">Why Invo?</h2><div class="features-grid">
+                <div class="feature-card"><div class="feature-icon">💸</div><h3>Zero Transfer Fees</h3><p>We are a non‑profit funded by donations. No hidden costs, no surprise deductions — just pure crypto.</p></div>
+                <div class="feature-card"><div class="feature-icon">🔐</div><h3>Non‑Custodial</h3><p>You hold your keys. We never store your seed phrase or private keys.</p></div>
+                <div class="feature-card"><div class="feature-icon">🌐</div><h3>Multi‑Wallet Support</h3><p>Works with MetaMask, Trust Wallet, Ledger, Coinbase Wallet, and 20+ more.</p></div>
+                <div class="feature-card"><div class="feature-icon">⚡</div><h3>Lightning Fast</h3><p>Transactions propagate in seconds with minimal gas optimization.</p></div>
+                <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Community Audited</h3><p>Open‑source and regularly reviewed by independent security researchers.</p></div>
+                <div class="feature-card"><div class="feature-icon">🤝</div><h3>Donation Driven</h3><p>Voluntary contributions keep the platform free for everyone.</p></div>
+            </div></section>
+
+            <div class="fee-comparison-wrapper fade-in-up">
+                <div class="card" style="text-align:center;">
+                    <h3 style="font-family:var(--font-mono); margin-bottom:6px; font-size:16px; font-weight:500;">📊 Transfer Fee Comparison</h3>
+                    <p style="font-size:11px; color:var(--text-muted); margin-bottom:18px;">See how much you really lose with other platforms</p>
+                    <div class="fee-calculator"><label>Amount:</label><input type="number" id="transferAmount" value="2000" min="1" step="100" oninput="updateFeeComparison()"><span style="color:var(--text-muted);">USD</span></div>
+                    <div id="dynamicFeeComparison"></div>
+                    <div id="yearlyLossBox" class="yearly-loss"></div>
+                    <p style="font-size:11px; color:var(--green); margin-top:14px; font-weight:600;">✨ Invo charges absolutely no transfer fees — ever. Only standard network gas applies.</p>
+                </div>
+            </div>
+
+            <hr class="gradient-sep">
+
+            <section id="how-it-works" class="section fade-in-up"><h2 class="section-title">How It Works</h2><div class="steps">
+                <div class="step"><div class="step-number">1</div><div class="step-content"><h4>Connect Your Wallet</h4><p>Enter your 12‑word recovery phrase — Invo never stores it.</p></div></div>
+                <div class="step"><div class="step-number">2</div><div class="step-content"><h4>Send or Swap Instantly</h4><p>Choose any supported token — with zero extra fees.</p></div></div>
+                <div class="step"><div class="step-number">3</div><div class="step-content"><h4>Track Everything</h4><p>View your balance, history, and gas savings in a clean dashboard.</p></div></div>
+            </div></section>
+
+            <hr class="gradient-sep">
+
+            <section id="wallets" class="section fade-in-up"><h2 class="section-title">20+ Supported Wallets</h2><div class="wallets-grid">
+                <div class="wallet-item"><span class="check">✓</span><span>MetaMask</span></div><div class="wallet-item"><span class="check">✓</span><span>Coinbase Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Trust Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Ledger Live</span></div><div class="wallet-item"><span class="check">✓</span><span>Trezor Suite</span></div><div class="wallet-item"><span class="check">✓</span><span>Exodus</span></div><div class="wallet-item"><span class="check">✓</span><span>Atomic Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>MyEtherWallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Rainbow</span></div><div class="wallet-item"><span class="check">✓</span><span>Argent</span></div><div class="wallet-item"><span class="check">✓</span><span>Pillar</span></div><div class="wallet-item"><span class="check">✓</span><span>imToken</span></div><div class="wallet-item"><span class="check">✓</span><span>TokenPocket</span></div><div class="wallet-item"><span class="check">✓</span><span>BitKeep</span></div><div class="wallet-item"><span class="check">✓</span><span>Safepal</span></div><div class="wallet-item"><span class="check">✓</span><span>MathWallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Guarda</span></div><div class="wallet-item"><span class="check">✓</span><span>Edge</span></div><div class="wallet-item"><span class="check">✓</span><span>Unstoppable Wallet</span></div><div class="wallet-item"><span class="check">✓</span><span>Frame</span></div>
+            </div></section>
+
+            <hr class="gradient-sep">
+
+            <section id="roadmap" class="section fade-in-up"><h2 class="section-title">Roadmap</h2><div class="roadmap-timeline"><div class="timeline-line"></div>
+                <div class="milestone left green"><div class="milestone-content" onclick="openRoadmapDetail('q1')"><span class="quarter-badge done">✅ COMPLETED</span><h4>Q1 2025 — Launch</h4><p>Zero‑fee transfers live on Ethereum mainnet.</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone right"><div class="milestone-content" onclick="openRoadmapDetail('q2')"><span class="quarter-badge upcoming">🔄 IN PROGRESS</span><h4>Q2 2025 — Multi‑Chain</h4><p>Expanding to Solana, Avalanche, and Polygon.</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone left"><div class="milestone-content" onclick="openRoadmapDetail('q3')"><span class="quarter-badge upcoming">📱 PLANNED</span><h4>Q3 2025 — Mobile App</h4><p>Native iOS and Android apps.</p></div><div class="milestone-dot"></div></div>
+                <div class="milestone right"><div class="milestone-content" onclick="openRoadmapDetail('q4')"><span class="quarter-badge upcoming">🗳️ PLANNED</span><h4>Q4 2025 — DAO Governance</h4><p>Community‑owned governance via INVO token.</p></div><div class="milestone-dot"></div></div>
+            </div></section>
+
+            <hr class="gradient-sep">
+
+            <section id="blog" class="section fade-in-up"><h2 class="section-title">📰 From the Lab</h2><div class="blog-grid">
+                <div class="blog-card"><img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=200&fit=crop" class="blog-img" alt="blog"><h4>Zero‑Fee Philosophy</h4><p>Why we built Invo as a non‑profit and how community donations keep it free.</p></div>
+                <div class="blog-card"><img src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=200&fit=crop" class="blog-img" alt="blog"><h4>Multi‑Chain Roadmap</h4><p>Expanding to Solana, Avalanche & Polygon — what it means for you.</p></div>
+                <div class="blog-card"><img src="https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=400&h=200&fit=crop" class="blog-img" alt="blog"><h4>DAO Governance</h4><p>How INVO token holders will shape the future of the platform.</p></div>
+            </div></section>
+
+            <hr class="gradient-sep">
+
+            <section id="donate" class="section fade-in-up"><h2 class="section-title">Support Our Mission</h2><div class="donate-grid">
+                <div class="donate-card" onclick="donate(5)"><div style="font-size:22px;font-weight:600;">$5</div><div style="color:var(--text-muted);">Buy us a coffee</div></div>
+                <div class="donate-card" onclick="donate(25)"><div style="font-size:22px;font-weight:600;">$25</div><div style="color:var(--text-muted);">Help development</div></div>
+                <div class="donate-card" onclick="donate(100)"><div style="font-size:22px;font-weight:600;">$100</div><div style="color:var(--text-muted);">Become a patron</div></div>
+            </div></section>
+
+            <section id="partners" class="section fade-in-up"><h2 class="section-title">Our Partners</h2><div class="partners-grid">
+                <div class="partner-logo">CHAIN</div><div class="partner-logo">BLOCK</div><div class="partner-logo">DEFI</div><div class="partner-logo">WEB3</div><div class="partner-logo">META</div><div class="partner-logo">VAULT</div>
+            </div></section>
+
+            <hr class="gradient-sep">
+
+            <section id="testimonials" class="section fade-in-up"><h2 class="section-title">What Our Users Say</h2>
+                <div class="reviews-carousel" id="reviewsCarousel"></div>
+                <div class="testimonials-grid">
+                    <div class="testimonial"><p class="testimonial-text">"Invo made crypto transfers feel like sending an email. Zero fees and super fast."</p><div class="testimonial-author">— Alex R., DeFi Developer</div></div>
+                    <div class="testimonial"><p class="testimonial-text">"Connected my Trust Wallet in seconds. The zero‑fee promise is real."</p><div class="testimonial-author">— Maria G., NFT Artist</div></div>
+                    <div class="testimonial"><p class="testimonial-text">"Finally, a platform that doesn't nickel and dime you."</p><div class="testimonial-author">— Jason K., Investor</div></div>
+                </div>
+            </section>
+
+            <section id="faq" class="section fade-in-up"><h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="faq-container">
+                    <div class="faq-search"><input type="text" id="faqSearchInput" placeholder="Search questions..." style="width:100%; padding:14px 18px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-full); color:var(--text-primary); font-family:var(--font-mono); outline:none;"></div>
+                    <div id="faqAccordion"></div>
+                </div>
+            </section>
+
+            <section class="newsletter-section fade-in-up">
+                <h2 class="section-title">Stay Updated</h2>
+                <p style="color:var(--text-muted); margin-bottom:20px;">Get the latest on zero‑fee crypto, directly to your inbox.</p>
+                <div class="newsletter-form"><input type="email" id="newsletterEmail" placeholder="your@email.com"><button class="btn btn-primary" onclick="subscribeNewsletter()">Subscribe</button></div>
+            </section>
+
+            <div style="text-align:center; margin:40px 0;"><button class="btn btn-primary btn-lg" onclick="openConnectModal()">🔗 Connect Your Wallet Now</button></div>
+        </div>
+
+        <div id="dashboardPage" class="dashboard">
+            <div style="background:rgba(240,165,0,0.04); border:1px solid rgba(240,165,0,0.15); border-radius:var(--radius); padding:12px 20px; display:flex; align-items:center; gap:8px; font-weight:500; color:var(--gold); margin-bottom:20px; font-size:13px;">⭐ Invo never charges fees for transfers or swaps.</div>
+            <div class="dashboard-clock" id="dashboardClock"></div>
+            <div class="price-ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+            <div class="card card-accent" style="text-align:center;" id="balanceCard">
+                <div style="text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:8px; font-size:11px;">💰 Total Balance</div>
+                <div class="balance-amount" id="totalBalance">$0.00</div>
+                <div id="balanceChange" style="display:inline-flex; align-items:center; gap:4px; font-size:13px; border-radius:14px; padding:5px 12px; margin-top:10px;">▲ 0.00%</div>
+                <div style="margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="openSendModal()">📤 Send</button>
+                    <button class="btn btn-outline" onclick="openReceiveModal()">📥 Receive</button>
+                    <button class="btn btn-outline" onclick="openSwapModal()">🔄 Swap</button>
+                </div>
+                <hr class="dashboard-divider">
+                <h4 style="font-family:var(--font-mono); font-size:14px; font-weight:500; margin-bottom:10px; text-align:left;">📈 Balance Trend</h4>
+                <div class="area-chart-container" id="areaChartContainer" style="height:200px;"><svg class="area-chart-svg" id="areaChartSvg" viewBox="0 0 600 220"></svg><div class="chart-tooltip" id="areaTooltip"></div></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="card"><h3 style="font-family:var(--font-mono); margin-bottom:14px;">📊 Portfolio Distribution</h3><div class="donut-chart" id="donutChart"></div></div>
+                <div class="card"><h3 style="font-family:var(--font-mono); margin-bottom:14px;">📊 Quick Stats</h3>
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--accent);" id="statTx">0</div><div style="font-size:9px; color:var(--text-muted);">Transactions</div></div>
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--green);" id="statGas">$0</div><div style="font-size:9px; color:var(--text-muted);">Gas Saved</div></div>
+                        <div style="text-align:center;"><div style="font-size:20px; font-weight:600; color:var(--gold);" id="statStreak">0d</div><div style="font-size:9px; color:var(--text-muted);">Streak</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top:24px;"><h3 style="font-family:var(--font-mono); margin-bottom:14px;">🪙 Your Tokens</h3><div id="tokenList"></div></div>
+            <div class="card" style="margin-top:24px;"><h3 style="font-family:var(--font-mono); margin-bottom:14px;">📋 Recent Activity</h3><div id="txList"></div></div>
+        </div>
+
+        <footer class="footer">
+            <div><div style="font-weight:600;margin-bottom:8px;font-size:16px;">Invo.</div><p>© 2025 Invo — A Non‑Profit Crypto Platform</p><p style="margin-top:4px;font-size:12px;">Built on Ethereum. Zero fees. Forever. No KYC required.</p><div style="margin-top:16px;display:flex;gap:8px;"><a href="#" class="social-btn" aria-label="Twitter">𝕏</a><a href="#" class="social-btn" aria-label="Discord">🎮</a><a href="#" class="social-btn" aria-label="GitHub">🐙</a><a href="#" class="social-btn" aria-label="Telegram">✈️</a></div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div><div style="font-weight:600;margin-bottom:8px;">Product</div><a href="#features">Features</a><br><a href="#wallets">Wallets</a><br><a href="#faq">FAQ</a></div>
+                <div><div style="font-weight:600;margin-bottom:8px;">Organization</div><a href="#">About</a><br><a href="#donate">Donate</a><br><a href="#">GitHub</a></div>
+                <div><div style="font-weight:600;margin-bottom:8px;">Legal</div><a href="#">Terms</a><br><a href="#">Privacy</a><br><a href="#">Contact</a></div>
+                <div><div style="font-weight:600;margin-bottom:8px;">Stay Updated</div><input type="email" id="subscribeEmail" placeholder="your@email.com" style="padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);width:140px;font-size:11px;"><button class="btn btn-sm btn-outline" style="margin-top:6px;" onclick="subscribe()">Subscribe</button></div>
+            </div>
+            <div style="grid-column:1/-1;text-align:center;margin-top:16px;">
+                <div class="security-badges">
+                    <div class="security-badge" onclick="openCertModal('CertiK')">🔒 Audited by CertiK</div>
+                    <div class="security-badge" onclick="openCertModal('BugBounty')">🛡️ Bug Bounty</div>
+                    <div class="security-badge" onclick="openCertModal('KYCfree')">✅ KYC‑free</div>
+                    <div class="security-badge" onclick="openCertModal('MiCA')">📜 MiCA Ready</div>
+                </div>
+                <a href="#" style="display:inline-flex;align-items:center;gap:4px;background:rgba(108,92,231,0.06);border:1px solid rgba(108,92,231,0.15);border-radius:6px;padding:6px 12px;color:var(--accent);font-weight:500;text-decoration:none;margin-top:10px;font-size:12px;" onclick="openStatusModal();return false;">📡 All Systems Operational ✅</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="connectModal" style="display:none;"><div class="modal"><h3>🔑 Connect with Seed Phrase</h3><div class="input-group"><label>12‑word recovery phrase</label><textarea id="seedInput" placeholder="Enter your 12 words separated by spaces..."></textarea></div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('connectModal')">Cancel</button><button class="btn btn-primary" onclick="connectWithSeed()">Connect Wallet</button></div></div></div>
+    <div class="modal-overlay" id="sendModal" style="display:none;"><div class="modal"><h3>📤 Send Crypto</h3><div class="input-group"><label>Token</label><select id="sendToken"><option>ETH</option><option>USDC</option><option>MATIC</option><option>UNI</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>Recipient</label><input type="text" id="sendAddress" placeholder="0x... or domain.crypto"></div><div class="input-group"><label>Amount</label><input type="number" id="sendAmount" placeholder="0.00" step="0.01" oninput="updateFeeEstimate()"></div><p style="color:var(--green);font-size:11px;">✨ Invo charges 0% transfer fees.</p><div class="fee-estimator">⛽ Estimated gas: <span id="feeAmount" style="color:var(--gold);">~$2.34</span></div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('sendModal')">Cancel</button><button class="btn btn-primary" onclick="confirmSend()">Send</button></div></div></div>
+    <div class="modal-overlay" id="receiveModal" style="display:none;"><div class="modal" style="text-align:center;"><h3>📥 Receive Crypto</h3><p style="color:var(--text-secondary);font-size:12px;">Share your address</p><div style="background:var(--bg-input);padding:16px;border-radius:var(--radius-sm);margin:14px 0;font-family:var(--font-mono);word-break:break-all;color:var(--accent);" id="receiveAddress">0xNotConnected</div><div class="modal-actions" style="justify-content:center;"><button class="btn btn-outline btn-sm" onclick="copyAddress()">📋 Copy</button><button class="btn btn-outline btn-sm" onclick="closeModal('receiveModal')">Close</button></div></div></div>
+    <div class="modal-overlay" id="swapModal" style="display:none;"><div class="modal"><h3>🔄 Quick Swap</h3><div class="input-group"><label>From</label><select id="swapFrom"><option>ETH</option><option>USDC</option><option>MATIC</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>To</label><select id="swapTo"><option>USDC</option><option>ETH</option><option>MATIC</option><option>LINK</option><option>AAVE</option></select></div><div class="input-group"><label>Amount</label><input type="number" id="swapAmount" placeholder="0.00" step="0.01"></div><p style="color:var(--green);font-size:11px;">✨ 0% swap fee from Invo.</p><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('swapModal')">Cancel</button><button class="btn btn-primary" onclick="confirmSwap()">Swap</button></div></div></div>
+    <div class="modal-overlay" id="roadmapDetailModal" style="display:none;"><div class="modal"><div id="roadmapDetailContent"></div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('roadmapDetailModal')">Close</button></div></div></div>
+    <div class="modal-overlay" id="certModal" style="display:none;"><div class="modal"><h3 id="certTitle"></h3><p id="certDescription"></p><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('certModal')">Close</button></div></div></div>
+    <div class="modal-overlay" id="statusModal" style="display:none;"><div class="modal"><h3>📡 System Status</h3><div class="status-row"><span class="status-dot-green"></span><span>Ethereum Node</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>API Gateway</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>Transaction Relay</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><div class="status-row"><span class="status-dot-green"></span><span>Database Cluster</span><span style="margin-left:auto;color:var(--green);">Operational</span></div><p style="text-align:center;color:var(--green);margin-top:12px;">✅ All Systems Operational</p><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="closeModal('statusModal')">Close</button></div></div></div>
+    <div class="modal-overlay" id="settingsModal" style="display:none;"><div class="modal"><h3>⚙️ Settings</h3><div class="settings-panel"><div class="setting-item"><span>Glass Effects</span><label class="switch"><input type="checkbox" id="settingGlass" onchange="toggleSetting('glass')" checked><span class="slider"></span></label></div><div class="setting-item"><span>Reduce Motion</span><label class="switch"><input type="checkbox" id="settingMotion" onchange="toggleSetting('motion')"><span class="slider"></span></label></div><div class="setting-item"><span>Glow Level</span><select id="settingGlow" onchange="applyGlow(this.value)" style="background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border);border-radius:2rem;padding:0.5rem 1rem;"><option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option></select></div><div class="modal-actions"><button class="btn btn-primary btn-sm" onclick="closeModal('settingsModal')">Close</button></div></div></div></div>
+    <div id="toastContainer"></div>
+    <div class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+    <script>
+        // Preloader
+        window.addEventListener('load', () => { setTimeout(() => document.getElementById('preloader').classList.add('hidden'), 800); });
+
+        // Scroll progress
+        window.addEventListener('scroll', () => {
+            const pct = (document.documentElement.scrollTop / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('scrollProgress').style.width = pct + '%';
+            document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 400);
+            document.getElementById('mainHeader').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Cookie banner
+        if (!localStorage.getItem('cookiesAccepted')) document.getElementById('cookieBanner').classList.add('show');
+        window.acceptCookies = () => { localStorage.setItem('cookiesAccepted', 'true'); document.getElementById('cookieBanner').classList.remove('show'); };
+
+        // Settings
+        window.openSettings = () => document.getElementById('settingsModal').style.display = 'flex';
+        window.toggleSetting = (key) => {
+            const el = document.getElementById('setting' + key.charAt(0).toUpperCase() + key.slice(1));
+            document.body.classList.toggle('glass-off', key === 'glass' && !el.checked);
+            document.body.classList.toggle('reduce-motion', key === 'motion' && el.checked);
+        };
+        window.applyGlow = (v) => { document.body.classList.remove('glow-low', 'glow-high'); if (v === 'low') document.body.classList.add('glow-low'); if (v === 'high') document.body.classList.add('glow-high'); };
+
+        // Mobile nav
+        function toggleMobileNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+        // Wallet state & core logic
+        (function() {
+            const state = {
+                connected: false,
+                address: '',
+                domain: '',
+                balances: { ETH: { amount: 0, usd: 0 }, USDC: { amount: 0, usd: 0 }, MATIC: { amount: 0, usd: 0 }, UNI: { amount: 0, usd: 0 }, LINK: { amount: 0, usd: 0 }, AAVE: { amount: 0, usd: 0 } },
+                transactions: [],
+                totalBalance: 0,
+                txCount: 0,
+                gasSaved: 0,
+                streak: 0,
+                settings: { showBalances: true, gasSpeed: 'average' },
+                addressBook: [],
+                donations: 847000,
+                balanceHistory: [],
+                priceHistory: { ETH: [], USDC: [], MATIC: [], UNI: [], LINK: [], AAVE: [] },
+                priceRange: '30D',
+                selectedPriceToken: 'ETH'
+            };
+            const prices = { ETH: 3450, USDC: 1.0, MATIC: 0.72, UNI: 8.5, LINK: 14.5, AAVE: 95 };
+            const landingPage = document.getElementById('landingPage'),
+                dashboardPage = document.getElementById('dashboardPage');
+            const walletDisplay = document.getElementById('walletAddressDisplay'),
+                totalBalEl = document.getElementById('totalBalance');
+            const changeEl = document.getElementById('balanceChange'),
+                tokenListEl = document.getElementById('tokenList');
+            const txListEl = document.getElementById('txList'),
+                receiveAddrEl = document.getElementById('receiveAddress');
+            const statTxEl = document.getElementById('statTx'),
+                statGasEl = document.getElementById('statGas'),
+                statStreakEl = document.getElementById('statStreak');
+            const walletDot = document.getElementById('walletDot');
+
+            function generateBalanceHistory(t) {
+                const d = [];
+                let v = t * 0.7;
+                const n = new Date();
+                for (let i = 29; i >= 0; i--) { const dt = new Date(n); dt.setDate(dt.getDate() - i);
+                    v += v * (Math.random() * 0.08 - 0.02);
+                    v = Math.max(v, t * 0.5);
+                    d.push({ date: dt, value: v }); }
+                d[d.length - 1] = { date: new Date(), value: t };
+                return d;
+            }
+
+            function generatePriceHistory(b) {
+                const d = [];
+                let v = b;
+                const n = new Date();
+                for (let i = 89; i >= 0; i--) { const dt = new Date(n); dt.setDate(dt.getDate() - i);
+                    v += v * (Math.random() * 0.06 - 0.025);
+                    v = Math.max(v, b * 0.5);
+                    d.push({ date: dt, value: v }); }
+                d[d.length - 1] = { date: new Date(), value: b };
+                return d;
+            }
+
+            function updateUI() {
+                if (!dashboardPage.classList.contains('active')) return;
+                const s = state.settings.showBalances;
+                totalBalEl.textContent = s ? '$' + state.totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '****';
+                const cp = state.totalBalance > 0 ? (Math.random() * 8 - 2).toFixed(2) : '0.00',
+                    cv = parseFloat(cp);
+                changeEl.textContent = (cv >= 0 ? '▲ ' : '▼ ') + Math.abs(cv).toFixed(2) + '%';
+                changeEl.style.color = cv >= 0 ? 'var(--green)' : 'var(--red)';
+                const tokens = [{ name: 'Ethereum', sym: 'ETH', icon: '⟠', data: state.balances.ETH, color: '#627eea' }, { name: 'USD Coin', sym: 'USDC',
+                    icon: '$', data: state.balances.USDC, color: '#2775ca' }, { name: 'Polygon', sym: 'MATIC', icon: '◆', data: state.balances.MATIC,
+                    color: '#8247e5' }, { name: 'Uniswap', sym: 'UNI', icon: '🦄', data: state.balances.UNI, color: '#ff007a' }, { name: 'Chainlink',
+                    sym: 'LINK', icon: '🔗', data: state.balances.LINK, color: '#2a5ada' }, { name: 'Aave', sym: 'AAVE', icon: '👻',
+                    data: state.balances.AAVE, color: '#b6509e' }];
+                tokenListEl.innerHTML = tokens.map(t => {
+                    const sd = (state.priceHistory[t.sym] || []).slice(-7);
+                    const sp = sd.length > 1 ? sd.map((d, i) => { const mn = Math.min(...sd.map(x => x.value)),
+                            mx = Math.max(...sd.map(x => x.value)),
+                            r = mx - mn || 1; return `${(i/(sd.length-1)*100).toFixed(1)},${(100-(d.value-mn)/r*100).toFixed(1)}`; }).join(
+                            ' ') : '0,50 100,50';
+                    return `<div class="token-row"><div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;font-size:12px;">${t.icon}</div><div><div style="font-weight:500;">${t.name}</div><div style="font-size:9px;color:var(--text-muted);">${t.sym}</div></div></div><svg class="mini-sparkline" viewBox="0 0 100 100"><polyline points="${sp}" fill="none" stroke="${t.color}" stroke-width="8" vector-effect="non-scaling-stroke"/></svg><div style="text-align:right;"><div style="font-family:var(--font-mono);font-size:12px;">${s?t.data.amount.toFixed(4):'***'}</div><div style="font-size:9px;color:var(--text-muted);">${s?'$'+t.data.usd.toFixed(2):'***'}</div></div></div>`;
+                }).join('');
+                if (state.transactions.length === 0) { txListEl.innerHTML =
+                        '<p style="color:var(--text-muted);text-align:center;padding:18px;">No transactions yet.</p>'; } else { txListEl.innerHTML =
+                        state.transactions.map((tx, i) =>
+                            `<div class="tx-item" onclick="openTxDetail(${i})"><div style="display:flex;align-items:center;gap:7px;"><span style="color:${tx.type==='sent'?'var(--red)':'var(--green)'};">${tx.type==='sent'?'↗':'↙'}</span><div><div style="font-weight:500;">${tx.type==='sent'?'Sent':'Received'} ${tx.token}</div><div style="font-size:8px;color:var(--text-muted);">${tx.address}</div></div></div><div style="font-family:var(--font-mono);color:${tx.type==='sent'?'var(--red)':'var(--green)'};font-size:12px;">${tx.type==='sent'?'-':'+'}${tx.amount} ${tx.token}</div></div>`
+                            ).join(''); }
+                statTxEl.textContent = state.txCount;
+                statGasEl.textContent = '$' + state.gasSaved.toFixed(2);
+                statStreakEl.textContent = state.streak + 'd';
+                updateDonutChart();
+                updateTicker();
+                renderBalanceChart();
+            }
+
+            function updateDonutChart() { const tk = ['ETH', 'USDC', 'MATIC', 'UNI', 'LINK', 'AAVE']; const cl = ['#627eea', '#2775ca', '#8247e5',
+                    '#ff007a', '#2a5ada', '#b6509e'
+                ]; const nm = ['Ethereum', 'USD Coin', 'Polygon', 'Uniswap', 'Chainlink', 'Aave']; const t = state.totalBalance; const cd =
+                    document.getElementById('donutChart'); if (t === 0) { cd.innerHTML =
+                    '<p style="color:var(--text-muted);">No balance data</p>'; return; } const cr = 2 * Math.PI * 45; let o = 0; const sg = [];
+                tk.forEach((k, i) => { const v = state.balances[k].usd; const p = v / t; const d = cr * p; const co = o;
+                    sg.push({ token: k, name: nm[i], color: cl[i], value: v, pct: p, dash: d, offset: co });
+                    o += d; });
+                cd.innerHTML =
+                    `<svg class="chart-svg" viewBox="0 0 100 100" style="transform:rotate(-90deg);"><circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="6"/>${sg.map(s=>`<circle cx="50" cy="50" r="45" fill="none" stroke="${s.color}" stroke-width="6" stroke-dasharray="${s.dash} ${cr-s.dash}" stroke-dashoffset="${-s.offset}" class="chart-segment"/>`).join('')}<circle cx="50" cy="50" r="20" fill="var(--bg-card)"/><text x="50" y="47" class="donut-centre-text">$${t.toLocaleString('en-US',{minimumFractionDigits:0})}</text></svg><div class="chart-legend">${sg.map(s=>`<div><span class="legend-dot" style="background:${s.color};"></span>${s.name} ${(s.pct*100).toFixed(1)}%</div>`).join('')}</div>`; }
+
+            function renderBalanceChart() { const d = state.balanceHistory; if (!d || d.length < 2) return; const svg = document.getElementById(
+                    'areaChartSvg'); const w = 600,
+                    h = 220,
+                    pad = { top: 20, right: 30, bottom: 30, left: 40 }; const cw = w - pad.left - pad.right,
+                    ch = h - pad.top - pad.bottom; const mn = Math.min(...d.map(x => x.value)) * 0.95,
+                    mx = Math.max(...d.map(x => x.value)) * 1.05; const sx = (i) => pad.left + (i / (d.length - 1)) * cw; const sy = (v) => pad
+                    .top + ch - ((v - mn) / (mx - mn)) * ch; const pts = d.map((p, i) =>
+                    `${sx(i).toFixed(1)},${sy(p.value).toFixed(1)}`).join(' '); const ap =
+                    `M${sx(0)},${pad.top+ch} L${pts} L${sx(d.length-1)},${pad.top+ch} Z`;
+                svg.innerHTML =
+                    `<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6c5ce7" stop-opacity="0.3"/><stop offset="100%" stop-color="#6c5ce7" stop-opacity="0.01"/></linearGradient></defs><path d="${ap}" fill="url(#areaGrad)" class="area-fill"/><polyline points="${pts}" class="area-line" stroke-dasharray="800" stroke-dashoffset="800" style="animation:sparkline-draw 1.6s forwards;"/>`;
+                if (!document.getElementById('sparklineKeyframes')) { const st = document.createElement('style');
+                    st.id = 'sparklineKeyframes';
+                    st.textContent = '@keyframes sparkline-draw{to{stroke-dashoffset:0;}}';
+                    document.head.appendChild(st); } }
+
+            function updateTicker() { const te = document.getElementById('tickerTrack'); const it = [{ sym: 'ETH', price: prices.ETH,
+                    change: 2.4 }, { sym: 'USDC', price: prices.USDC, change: 0 }, { sym: 'MATIC', price: prices.MATIC, change: -1.1 }, { sym: 'UNI',
+                    price: prices.UNI, change: 5.7 }, { sym: 'LINK', price: prices.LINK, change: -0.8 }, { sym: 'AAVE', price: prices.AAVE,
+                    change: 3.2
+                }];
+                te.innerHTML = it.concat(it).map(i =>
+                    `<div class="ticker-item"><span>${i.sym}</span><span>$${i.price.toFixed(2)}</span><span class="${i.change>=0?'up':'down'}">${i.change>=0?'▲':'▼'}${Math.abs(i.change).toFixed(1)}%</span></div>`
+                    ).join(''); }
+
+            function finalizeConnection(addr, disp) { state.connected = true;
+                state.address = addr;
+                state.domain = disp || addr;
+                state.balances = { ETH: { amount: 2.45, usd: 2.45 * prices.ETH }, USDC: { amount: 3500, usd: 3500 }, MATIC: { amount: 1200,
+                        usd: 1200 * prices.MATIC }, UNI: { amount: 85, usd: 85 * prices.UNI }, LINK: { amount: 150, usd: 150 * prices
+                        .LINK }, AAVE: { amount: 12, usd: 12 * prices.AAVE } };
+                state.totalBalance = Object.values(state.balances).reduce((s, b) => s + b.usd, 0);
+                state.txCount = 12;
+                state.gasSaved = 34.5;
+                state.streak = 7;
+                state.transactions = [{ type: 'received', token: 'ETH', amount: '0.85', address: '0x1a2b...c3D4' }, { type: 'sent',
+                    token: 'USDC', amount: '500', address: '0x9F8e...7A1b' }, { type: 'received', token: 'MATIC', amount: '300',
+                    address: 'bob.crypto' }, { type: 'sent', token: 'ETH', amount: '0.15', address: '0x4C5d...E2f6' }, { type: 'received',
+                    token: 'UNI', amount: '25', address: '0x7B3a...9D0c' }, { type: 'sent', token: 'USDC', amount: '200',
+                    address: 'carol.eth' }];
+                state.balanceHistory = generateBalanceHistory(state.totalBalance); const tks = ['ETH', 'USDC', 'MATIC', 'UNI', 'LINK', 'AAVE'];
+                tks.forEach(t => { state.priceHistory[t] = generatePriceHistory(prices[t]); });
+                showSkeletonLoading(() => { landingPage.classList.add('hidden');
+                    dashboardPage.classList.add('active');
+                    walletDisplay.textContent = state.domain.length > 16 ? state.domain.slice(0, 14) + '...' : state.domain;
+                    walletDot.style.background = 'var(--green)';
+                    receiveAddrEl.textContent = state.address;
+                    updateUI(); }); }
+
+            function showSkeletonLoading(cb) { const o = document.createElement('div');
+                o.className = 'skeleton-overlay';
+                o.innerHTML = '<div class="skeleton-card"></div><div class="skeleton-card"></div>';
+                document.body.appendChild(o);
+                setTimeout(() => { o.remove();
+                    cb(); }, 700); }
+
+            function disconnect() { state.connected = false;
+                state.address = '';
+                state.domain = '';
+                state.balances = { ETH: { amount: 0, usd: 0 }, USDC: { amount: 0, usd: 0 }, MATIC: { amount: 0, usd: 0 }, UNI: { amount: 0,
+                        usd: 0 }, LINK: { amount: 0, usd: 0 }, AAVE: { amount: 0, usd: 0 } };
+                state.totalBalance = 0;
+                state.transactions = [];
+                state.txCount = 0;
+                state.gasSaved = 0;
+                state.streak = 0;
+                landingPage.classList.remove('hidden');
+                dashboardPage.classList.remove('active');
+                walletDisplay.textContent = 'Not Connected';
+                walletDot.style.background = 'var(--text-muted)';
+                receiveAddrEl.textContent = '0xNotConnected'; }
+
+            window.handleWalletClick = function() { if (state.connected) { if (confirm('Disconnect wallet?')) disconnect(); } else
+            openConnectModal(); };
+            window.connectWithSeed = function() { const w = document.getElementById('seedInput').value.trim(); if (w.split(/\s+/).length <
+                    12) { showToast('❌ Please enter all 12 words.', 'error'); return; } const fa = '0x' + Array.from({ length: 40 }, () =>
+                    Math.floor(Math.random() * 16).toString(16)).join('');
+                finalizeConnection(fa, 'seed-connected.crypto');
+                closeModal('connectModal');
+                document.getElementById('seedInput').value = '';
+                showToast('🔑 Wallet connected', 'success'); };
+            window.openSendModal = function() { if (!state.connected) { showToast('⚠️ Connect first!', 'error'); return; }
+                document.getElementById('sendModal').style.display = 'flex';
+                updateFeeEstimate(); };
+            window.openReceiveModal = function() { if (!state.connected) { showToast('⚠️ Connect first!', 'error'); return; }
+                receiveAddrEl.textContent = state.address;
+                document.getElementById('receiveModal').style.display = 'flex'; };
+            window.openSwapModal = function() { if (!state.connected) { showToast('⚠️ Connect first!', 'error'); return; }
+                document.getElementById('swapModal').style.display = 'flex'; };
+            window.updateFeeEstimate = function() { document.getElementById('feeAmount').textContent = '~$' + (Math.random() * 2.5 + 1)
+            .toFixed(2); };
+            window.confirmSend = function() { const t = document.getElementById('sendToken').value,
+                    a = document.getElementById('sendAddress').value.trim(),
+                    am = parseFloat(document.getElementById('sendAmount').value); if (!a || !am || am <= 0 || am > state.balances[t]
+                    .amount) { showToast('❌ Invalid', 'error'); return; }
+                state.balances[t].amount -= am;
+                state.balances[t].usd = state.balances[t].amount * prices[t];
+                state.totalBalance = Object.values(state.balances).reduce((s, b) => s + b.usd, 0);
+                state.transactions.unshift({ type: 'sent', token: t, amount: am.toFixed(2), address: a.length > 14 ? a.slice(0, 12) +
+                        '...' : a });
+                state.txCount++;
+                updateUI();
+                closeModal('sendModal');
+                showToast(`✅ Sent ${am} ${t}`, 'success'); };
+            window.confirmSwap = function() { const f = document.getElementById('swapFrom').value,
+                    t = document.getElementById('swapTo').value,
+                    am = parseFloat(document.getElementById('swapAmount').value); if (!am || am <= 0 || f === t || am > state.balances[f]
+                    .amount) { showToast('❌ Invalid', 'error'); return; } const r = prices[f] / prices[t],
+                    rc = am * r * 0.995;
+                state.balances[f].amount -= am;
+                state.balances[f].usd = state.balances[f].amount * prices[f];
+                state.balances[t].amount += rc;
+                state.balances[t].usd = state.balances[t].amount * prices[t];
+                state.totalBalance = Object.values(state.balances).reduce((s, b) => s + b.usd, 0);
+                state.txCount++;
+                state.gasSaved += parseFloat((Math.random() * 2.5 + 0.8).toFixed(2));
+                state.transactions.unshift({ type: 'sent', token: f, amount: am.toFixed(2), address: '🔄 Swap' });
+                state.transactions.unshift({ type: 'received', token: t, amount: rc.toFixed(4), address: '🔄 Swap' });
+                updateUI();
+                closeModal('swapModal');
+                showToast(`🔄 Swapped`, 'success'); };
+            window.copyAddress = function() { if (!state.connected) return;
+                navigator.clipboard.writeText(state.address).then(() => showToast('📋 Copied!', 'success')); };
+            window.donate = function(am) { state.donations += am; const dv = document.getElementById('donationsValue'); if (dv) dv
+                    .textContent = '$' + (state.donations / 1000).toFixed(0) + 'K';
+                showToast(`❤️ Thank you!`, 'success'); };
+            window.subscribe = function() { const e = document.getElementById('subscribeEmail').value;
+                showToast(e ? '📧 Subscribed!' : '❌ Enter email', e ? 'success' : 'error'); };
+            window.openTxDetail = function(i) { const tx = state.transactions[i]; if (tx) showToast(`📋 ${tx.type==='sent'?'Sent':'Received'} ${tx.amount} ${tx.token} — ${tx.address}`, 'success'); };
+
+            function updateClock() { const el = document.getElementById('dashboardClock'); if (el) el.textContent = new Date()
+            .toLocaleString(); }
+            setInterval(updateClock, 1000);
+            let block = 19847256;
+            setInterval(() => { block++;
+                document.getElementById('blockNumber').textContent = '#' + block.toLocaleString(); }, 15000);
+            let gwei = 24;
+            setInterval(() => { gwei = Math.floor(Math.random() * 28 + 12);
+                document.getElementById('gasPrice').textContent = '⚡ ' + gwei + ' gwei'; }, 10000);
+
+            updateUI();
+        })();
+
+        // Global modal & toast functions
+        window.openConnectModal = function() { document.getElementById('connectModal').style.display = 'flex'; };
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
+        window.openStatusModal = function() { document.getElementById('statusModal').style.display = 'flex'; };
+
+        function showToast(msg, type) { const t = document.createElement('div');
+            t.className = `toast ${type||'success'}`;
+            t.innerHTML = `${msg}<div class="toast-progress"></div>`;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => { t.style.opacity = '0';
+                t.style.transform = 'translateX(120%)';
+                t.style.transition = '0.25s';
+                setTimeout(() => t.remove(), 250); }, 2600); }
+        window.showToast = showToast;
+
+        window.toggleFaq = function(el) { el.closest('.faq-item').classList.toggle('open'); };
+        document.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m
+                .style.display = 'none'); });
+
+        // Fee comparison
+        function updateFeeComparison() { const a = parseFloat(document.getElementById('transferAmount').value) || 2000,
+                ca = a * 0.028,
+                cb = a * 0.035,
+                yw = cb * 52;
+            document.getElementById('dynamicFeeComparison').innerHTML =
+                `<div class="fee-comp-card invo-highlight"><div class="fee-comp-icon green">✓</div><div class="fee-comp-info"><div class="fee-comp-name" style="color:var(--green);">Invo</div><div class="fee-comp-rate">0% fee — <strong style="color:var(--green);">$0.00</strong></div></div><div class="fee-comp-bar-wrap"><div class="fee-comp-bar-track"><div class="fee-comp-bar-fill green" style="width:0%;"></div></div></div><div class="fee-comp-save green">Save $${Math.max(ca,cb).toFixed(0)}</div></div><div class="fee-comp-card"><div class="fee-comp-icon orange">!</div><div class="fee-comp-info"><div class="fee-comp-name" style="color:var(--gold);">Competitor A</div><div class="fee-comp-rate">2.8% — <strong style="color:var(--gold);">$${ca.toFixed(2)}</strong></div><div class="fee-comp-impact">You <span class="loss">LOSE $${ca.toFixed(2)}</span></div></div><div class="fee-comp-bar-wrap"><div class="fee-comp-bar-track"><div class="fee-comp-bar-fill orange" style="width:${(2.8/4*100).toFixed(1)}%;"></div></div></div></div><div class="fee-comp-card"><div class="fee-comp-icon red">✗</div><div class="fee-comp-info"><div class="fee-comp-name" style="color:var(--red);">Competitor B</div><div class="fee-comp-rate">3.5% — <strong style="color:var(--red);">$${cb.toFixed(2)}</strong></div><div class="fee-comp-impact">You <span class="loss">LOSE $${cb.toFixed(2)}</span></div></div><div class="fee-comp-bar-wrap"><div class="fee-comp-bar-track"><div class="fee-comp-bar-fill red" style="width:${(3.5/4*100).toFixed(1)}%;"></div></div></div></div>`;
+            document.getElementById('yearlyLossBox').innerHTML =
+                `<strong>⚠️ Yearly impact:</strong> Weekly transfers = <strong>$${yw.toLocaleString()}</strong>/year lost.`; }
+        updateFeeComparison();
+
+        // Roadmap details
+        const rd = { q1: { title: 'Q1 2025 — Launch ✅', progress: 100, desc: 'Zero‑fee transfers live on Ethereum mainnet.',
+                features: ['Ethereum mainnet', '20+ wallets', '0% fees'] }, q2: { title: 'Q2 2025 — Multi‑Chain 🔄', progress: 45,
+                desc: 'Expanding to Solana, Avalanche, and Polygon.', features: ['Solana', 'Avalanche', 'Polygon'] }, q3: { title: 'Q3 2025 — Mobile App 📱',
+                progress: 15, desc: 'Native iOS and Android apps.', features: ['iOS', 'Android', 'Biometric auth'] }, q4: { title: 'Q4 2025 — DAO Governance 🗳️',
+                progress: 10, desc: 'INVO token for community governance.', features: ['INVO token', 'Snapshot voting', 'Treasury'] } };
+        window.openRoadmapDetail = function(q) { const d = rd[q]; if (!d) return;
+            document.getElementById('roadmapDetailContent').innerHTML =
+                `<h3>${d.title}</h3><div class="progress-bar"><div class="progress-bar-fill" style="width:${d.progress}%;"></div></div><p>${d.desc}</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${d.features.map(f=>`<div style="background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:6px;">✓ ${f}</div>`).join('')}</div>`;
+            document.getElementById('roadmapDetailModal').style.display = 'flex'; };
+
+        // Cert modal
+        const crt = { CertiK: { title: '🔒 Audited by CertiK', desc: 'Fully audited by the leading blockchain security firm.' },
+            BugBounty: { title: '🛡️ Bug Bounty', desc: 'Active bug bounty with rewards up to $50,000.' }, KYCfree: { title: '✅ KYC‑free',
+                desc: 'No identity verification required.' }, MiCA: { title: '📜 MiCA Ready',
+            desc: 'Compliant with EU MiCA regulation.' } };
+        window.openCertModal = function(t) { const c = crt[t]; if (!c) return;
+            document.getElementById('certTitle').textContent = c.title;
+            document.getElementById('certDescription').textContent = c.desc;
+            document.getElementById('certModal').style.display = 'flex'; };
+
+        // FAQ
+        const faqData = [{ q: 'How does Invo stay free?', a: 'We are a registered non‑profit funded by community donations.' }, { q: 'Which wallets are supported?',
+            a: 'Any wallet using a standard 12‑word recovery phrase.' }, { q: 'Are there hidden fees?',
+            a: 'Never. Only network gas fees apply.' }, { q: 'Can I donate?',
+            a: 'Yes! Every contribution helps keep the platform free.' }, { q: 'What is the roadmap?',
+            a: 'Multi‑chain in Q2, mobile app in Q3, DAO in Q4.' }, { q: 'Is KYC required?',
+        a: 'No. Invo is completely KYC‑free.' }];
+
+        function renderFAQ(filter = '') { const acc = document.getElementById('faqAccordion'); const f = faqData.filter(i => !filter || i.q
+                .toLowerCase().includes(filter) || i.a.toLowerCase().includes(filter));
+            acc.innerHTML = f.map(i =>
+                `<div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">${i.q} <span>▼</span></div><div class="faq-answer">${i.a}</div></div>`
+                ).join(''); }
+        renderFAQ();
+        document.getElementById('faqSearchInput').addEventListener('input', e => renderFAQ(e.target.value));
+
+        // Reviews carousel
+        const reviews = ['"Zero fees changed how I use crypto. Invo is a game‑changer." — Sam K.',
+            '"Finally a non‑profit that actually delivers. Smooth, fast, free." — Priya M.',
+            '"Connected my Ledger in seconds. The dashboard is beautiful." — Jordan T.'
+        ];
+        let ri = 0;
+        document.getElementById('reviewsCarousel').innerHTML = reviews.map((r, i) =>
+            `<div class="review-slide ${i===0?'active':''}"><p>${r}</p></div>`).join('');
+        setInterval(() => { const sl = document.querySelectorAll('.review-slide');
+            sl.forEach(s => s.classList.remove('active'));
+            sl[ri].classList.add('active');
+            ri = (ri + 1) % reviews.length; }, 4000);
+
+        // Newsletter
+        window.subscribeNewsletter = () => { const e = document.getElementById('newsletterEmail').value;
+            showToast(e ? '📧 Subscribed!' : '❌ Enter email', e ? 'success' : 'error'); };
+
+        // Stats counter
+        const so = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { const el = e.target,
+                        t = parseInt(el.dataset.target),
+                        p = el.dataset.prefix || '',
+                        s = el.dataset.suffix || ''; if (t && !el.dataset.done) { el.dataset.done = '1'; let c = 0; const iv =
+                        setInterval(() => { c += t / 60; if (c >= t) { c = t;
+                                clearInterval(iv); }
+                            el.textContent = p + Math.floor(c).toLocaleString() + s; }, 25); }
+                    so.unobserve(el); } }); }, { threshold: 0.5 });
+        document.querySelectorAll('.stat-value[data-target]').forEach(el => so.observe(el));
+
+        // Fade-in observer
+        const fo = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible');
+                    fo.unobserve(e.target); } }); }, { threshold: 0.15 });
+        document.querySelectorAll('.fade-in-up').forEach(el => fo.observe(el));
+
+        // Card mouse tracking
+        document.addEventListener('mousemove', e => { document.querySelectorAll('.card').forEach(c => { const r = c.getBoundingClientRect();
+                c.style.setProperty('--mouse-x', Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)).toFixed(3));
+                c.style.setProperty('--mouse-y', Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)).toFixed(3)); }); });
+
+        // Particle background
+        (function() { const c = document.getElementById('particleCanvas'),
+                ctx = c.getContext('2d'); let p = []; const mx = 50;
+
+            function rs() { c.width = window.innerWidth;
+                c.height = window.innerHeight; }
+            window.addEventListener('resize', rs);
+            rs(); class P { constructor() { this.x = Math.random() * c.width;
+                    this.y = Math.random() * c.height;
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = (Math.random() - 0.5) * 0.3;
+                    this.r = Math.random() * 2 + 1; }
+                upd() { this.x += this.vx;
+                    this.y += this.vy; if (this.x < 0 || this.x > c.width) this.vx *= -1; if (this.y < 0 || this.y > c.height) this.vy *=
+                        -1; }
+                dr() { ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(108,92,231,0.35)';
+                    ctx.fill(); } } for (let i = 0; i < mx; i++) p.push(new P());
+
+            function anim() { ctx.clearRect(0, 0, c.width, c.height); for (let i = 0; i < p.length; i++) { p[i].upd();
+                    p[i].dr(); for (let j = i + 1; j < p.length; j++) { const dx = p[i].x - p[j].x,
+                            dy = p[i].y - p[j].y; if (Math.sqrt(dx * dx + dy * dy) < 100) { ctx.beginPath();
+                            ctx.moveTo(p[i].x, p[i].y);
+                            ctx.lineTo(p[j].x, p[j].y);
+                            ctx.strokeStyle = 'rgba(108,92,231,0.06)';
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke(); } } }
+                requestAnimationFrame(anim); }
+            anim(); })();
+    </script>
+</body>
+</html>
